@@ -329,6 +329,10 @@ namespace Celeste {
         [MonoModIgnore]
         [PatchPlayerApproachMaxMove]
         private extern int NormalUpdate();
+
+        [MonoModIgnore]
+        [PatchPlayerOnSquish]
+        protected extern override void OnSquish(CollisionData data);
     }
 
     public static class PlayerExt {
@@ -403,6 +407,12 @@ namespace MonoMod {
     /// </summary>
     [MonoModCustomMethodAttribute(nameof(MonoModRules.PatchPlayerApproachMaxMove))]
     class PatchPlayerApproachMaxMoveAttribute : Attribute { }
+
+    /// <summary>
+    /// Patches the method to skip squish checks for the CassetteFly state
+    /// </summary>
+    [MonoModCustomMethodAttribute(nameof(MonoModRules.PatchPlayerOnSquish))]
+    class PatchPlayerOnSquishAttribute : Attribute { }
 
     static partial class MonoModRules {
 
@@ -600,6 +610,28 @@ namespace MonoMod {
                         throw new Exception($"Unexpected instruction in DeltaTime multiplier calculation: {instr}");
                 }
             }
+        }
+
+        public static void PatchPlayerOnSquish(ILContext context, CustomAttribute attrib) {
+            FieldDefinition f_Player_StateMachine = context.Method.DeclaringType.FindField("StateMachine");
+            MethodDefinition m_StateMachine_get_State = f_Player_StateMachine.FieldType.Resolve().FindMethod("System.Int32 get_State()");
+
+            ILCursor cursor = new ILCursor(context);
+            ILLabel label = cursor.DefineLabel();
+
+            /*
+            Add a cassette fly check at the start of the method:
+            + if (this.StateMachine.State == StCassetteFly)
+            +    return;
+            */
+
+            cursor.EmitLdarg(0);
+            cursor.EmitLdfld(f_Player_StateMachine);
+            cursor.EmitCallvirt(m_StateMachine_get_State);
+            cursor.EmitLdcI4(21);
+            cursor.EmitBneUn(label);
+            cursor.EmitRet();
+            cursor.MarkLabel(label);
         }
     }
 }
