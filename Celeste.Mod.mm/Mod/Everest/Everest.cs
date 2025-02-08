@@ -1,6 +1,7 @@
 ﻿using Celeste.Mod.Core;
 using Celeste.Mod.Helpers;
 using Celeste.Mod.Helpers.LegacyMonoMod;
+using Celeste.Mod.Registry;
 using Celeste.Mod.UI;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -791,6 +792,9 @@ namespace Celeste.Mod {
             if (_Initialized) {
                 ((Monocle.patch_Commands) Engine.Commands).ReloadCommandsList();
             }
+
+            if (module is not NullModule)
+                EntityRegistry.OnModAssemblyUnload(module.GetType().Assembly);
 
             InvalidateInstallationHash();
 

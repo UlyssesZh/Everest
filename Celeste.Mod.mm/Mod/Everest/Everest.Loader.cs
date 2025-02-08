@@ -2,6 +2,7 @@
 using Celeste.Mod.Core;
 using Celeste.Mod.Entities;
 using Celeste.Mod.Helpers;
+using Celeste.Mod.Registry;
 using Ionic.Zip;
 using MAB.DotIgnore;
 using Microsoft.Xna.Framework;
@@ -608,7 +609,7 @@ namespace Celeste.Mod {
 
                             patch_Level.EntityLoader loader = null;
 
-                            ConstructorInfo ctor;
+                            ConstructorInfo ctor = null;
                             MethodInfo gen;
 
                             gen = type.GetMethod(genName, new Type[] { typeof(Level), typeof(LevelData), typeof(Vector2), typeof(EntityData) });
@@ -678,6 +679,13 @@ namespace Celeste.Mod {
                                 Logger.Warn("core", $"Found custom entity without suitable constructor / {genName}(Level, LevelData, Vector2, EntityData): {id} ({type.FullName})");
                                 continue;
                             }
+
+                            // Immediately register the connection when we're calling the ctor,
+                            // since we know the return type upfront.
+                            if (ctor != null) {
+                                EntityRegistry.RegisterSidToTypeConnection(id, ctor.DeclaringType);
+                            }
+                            
                             patch_Level.EntityLoaders[id] = loader;
                         }
                     }
