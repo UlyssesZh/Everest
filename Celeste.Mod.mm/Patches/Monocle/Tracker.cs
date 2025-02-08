@@ -192,20 +192,6 @@ namespace Monocle {
             }
         }
 
-        private List<Entity> _emptyEntityList;
-        
-        [MonoModReplace] // Fix crash on non-tracked type
-        public new List<Entity> GetEntities<T>() where T : Entity
-        {
-            return Entities.TryGetValue(typeof(T), out var entities) ? entities : (_emptyEntityList ??= new List<Entity>());
-        }
-
-        [MonoModReplace] // Fix crash on non-tracked type
-        public new IEnumerator<T> EnumerateEntities<T>() where T : Entity {
-            foreach (Entity item in GetEntities<T>())
-                yield return item as T;
-        }
-
         /// <summary>
         /// Gets all entities of the given type, adding that type to the tracker if needed.
         /// </summary>
