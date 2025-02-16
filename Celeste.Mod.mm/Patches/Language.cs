@@ -23,7 +23,7 @@ namespace Celeste {
         internal Dictionary<string, int> ReadCount;
         internal string CurrentlyReadingFrom;
 
-        [GeneratedRegex(@"^(?:\{.*?\})+$")]
+        [GeneratedRegex(@"^(?:\{[^}]*\}\s*)*$")]
         private static partial Regex WholeLineIsCommandsRegex();
 
         [GeneratedRegex(@"\{(.*?)\}", RegexOptions.RightToLeft)]

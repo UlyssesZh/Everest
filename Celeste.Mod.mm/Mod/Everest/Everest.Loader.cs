@@ -3,7 +3,6 @@ using Celeste.Mod.Core;
 using Celeste.Mod.Entities;
 using Celeste.Mod.Helpers;
 using Celeste.Mod.Registry;
-using Ionic.Zip;
 using MAB.DotIgnore;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -14,6 +13,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 
@@ -238,7 +238,7 @@ namespace Celeste.Mod {
                         LoadDir(e.FullPath);
                     else if (e.FullPath.EndsWith(".zip"))
                         LoadZip(e.FullPath);
-                    ((patch_OuiMainMenu) (AssetReloadHelper.ReturnToScene as Overworld)?.GetUI<OuiMainMenu>())?.RebuildMainAndTitle();
+                    ((patch_OuiMainMenu) (AssetReloadHelper.ReturnToScene as Overworld)?.GetUI<OuiMainMenu>())?.NeedsRebuild();
                 })));
             }
 
@@ -267,14 +267,14 @@ namespace Celeste.Mod {
 
                 bool metaParsed = false;
 
-                using (ZipFile zip = new ZipFile(archive)) {
-                    foreach (ZipEntry entry in zip.Entries) {
-                        if (entry.FileName is "everest.yaml" or "everest.yml") {
+                using (ZipArchive zip = ZipFile.OpenRead(archive)) {
+                    foreach (ZipArchiveEntry entry in zip.Entries) {
+                        if (entry.FullName is "everest.yaml" or "everest.yml") {
                             if (metaParsed) {
-                                Logger.Warn("loader", $"{archive} has both everest.yaml and everest.yml. Ignoring {entry.FileName}.");
+                                Logger.Warn("loader", $"{archive} has both everest.yaml and everest.yml. Ignoring {entry.FullName}.");
                                 continue;
                             }
-                            using (MemoryStream stream = entry.ExtractStream())
+                            using (Stream stream = entry.Open())
                             using (StreamReader reader = new StreamReader(stream)) {
                                 try {
                                     if (!reader.EndOfStream) {
@@ -285,16 +285,17 @@ namespace Celeste.Mod {
                                         }
                                     }
                                 } catch (Exception e) {
-                                    Logger.Warn("loader", $"Failed parsing {entry.FileName} in {archive}: {e}");
+                                    Logger.Warn("loader", $"Failed parsing {entry.FullName} in {archive}: {e}");
                                     FilesWithMetadataLoadFailures.Add(archive);
                                 }
                             }
                             metaParsed = true;
                             continue;
                         }
-                        if (entry.FileName == ".everestignore") {
+                        
+                        if (entry.FullName == ".everestignore") {
                             List<string> lines = new List<string>();
-                            using (MemoryStream stream = entry.ExtractStream())
+                            using (Stream stream = entry.Open())
                             using (StreamReader reader = new StreamReader(stream)) {
                                 while (!reader.EndOfStream) {
                                     lines.Add(reader.ReadLine());

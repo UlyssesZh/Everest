@@ -1,14 +1,13 @@
 using Celeste.Mod.Helpers;
 using Celeste.Mod.Meta;
-using Ionic.Zip;
 using MAB.DotIgnore;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -368,15 +367,6 @@ namespace Celeste.Mod {
     }
 
     public class ZipModContent : ModContent {
-        private static readonly FieldInfo f_ZipEntry__container =
-            typeof(ZipEntry).GetField("_container", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly FieldInfo f_ZipEntry__CompressionMethod_FromZipFile =
-            typeof(ZipEntry).GetField("_CompressionMethod_FromZipFile", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly FieldInfo f_ZipEntry__CompressedFileDataSize =
-            typeof(ZipEntry).GetField("_CompressedFileDataSize", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly FieldInfo f_ZipEntry__archiveStream =
-            typeof(ZipEntry).GetField("_archiveStream", BindingFlags.NonPublic | BindingFlags.Instance);
-
         public override string DefaultName => System.IO.Path.GetFileName(Path);
 
         /// <summary>
@@ -384,94 +374,35 @@ namespace Celeste.Mod {
         /// </summary>
         public readonly string Path;
 
-        /// <summary>
-        /// The loaded archive containing the mod content.
-        /// </summary>
-        public readonly ZipFile Zip;
-
-        private readonly ZipModSecret Secret;
-        private object _container;
-
-        public class ZipModSecret {
-            private ZipModContent Content;
-            internal ZipModSecret(ZipModContent content) {
-                Content = content;
-            }
-            public ZipEntry OpenParaEntry(ZipEntry real) => Content.OpenParaEntry(real);
-            public void CloseParaEntry(ZipEntry fake) => Content.CloseParaEntry(fake);
-        }
-
-        private class ZipPoolEntry {
-            public Stream Value;
-        }
-
-        private ConcurrentBag<ZipPoolEntry> Pool = new ConcurrentBag<ZipPoolEntry>();
+        private readonly ZipArchive zip;
 
         public ZipModContent(string path) {
             Path = path;
-            Zip = OpenZip();
-            Secret = new ZipModSecret(this);
-        }
-
-        public ZipFile OpenZip() => new ZipFile(Path);
-
-        private ZipEntry OpenParaEntry(ZipEntry real) {
-            Stream stream;
-
-            Retake:
-            if (Pool.TryTake(out ZipPoolEntry pooled)) {
-                stream = Interlocked.Exchange(ref pooled.Value, null);
-                if (stream == null)
-                    goto Retake;
-                stream.Seek(0, SeekOrigin.Begin);
-            } else {
-                // Same as DotNetZip itself. Luckily we're not dealing with segmented (multi-part) zips.
-                stream = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Write);
-            }
-
-            // TODO: ILHook CloneForNewZipFile to adapt it to our needs and to simplify the following code.
-            // Nothing else should be using it anyway (and if anything does, copy method with DynamicMethodDefinition).
-
-            // Thanks, DotNetZip, for being unwilling to clone uncompressed entries in compressed zips?!
-            // ZipEntry has got a special CompressionMethod setter while ZipFile doesn't.
-            // Let's hope that its value isn't used anywhere else...
-            ZipEntry fake;
-            lock (Zip) {
-                Zip.CompressionMethod = real.CompressionMethod;
-                fake = real.CloneForNewZipFile(Zip);
-            }
-            // Can't re-set the compression methods as this might be conflicting with other ongoing clonings.
-            f_ZipEntry__container.SetValue(fake, _container ??= f_ZipEntry__container.GetValue(real));
-            f_ZipEntry__CompressionMethod_FromZipFile.SetValue(fake, (short) real.CompressionMethod);
-            f_ZipEntry__CompressedFileDataSize.SetValue(fake, f_ZipEntry__CompressedFileDataSize.GetValue(real));
-            f_ZipEntry__archiveStream.SetValue(fake, stream);
-            return fake;
-        }
-
-        private void CloseParaEntry(ZipEntry fake) {
-            // Allow reopens - even by other threads - within a certain timeframe.
-            Stream stream = (Stream) f_ZipEntry__archiveStream.GetValue(fake);
-            ZipPoolEntry pooled = new ZipPoolEntry() {
-                Value = stream
-            };
-            Pool.Add(pooled);
-            QueuedTaskHelper.Do(stream, 1.5, () => Interlocked.Exchange(ref pooled.Value, null)?.Dispose());
+            zip = ZipFile.OpenRead(path);
         }
 
         protected override void Crawl() {
-            foreach (ZipEntry entry in Zip.Entries) {
-                string entryName = entry.FileName.Replace('\\', '/');
-                if (entryName.EndsWith("/"))
-                    continue;
-                Add(entryName, new ZipModAsset(this, Secret, entry));
+            lock (zip) {
+                foreach (ZipArchiveEntry entry in zip.Entries) {
+                    string entryName = entry.FullName.Replace('\\', '/');
+                    if (entryName.EndsWith("/")) continue;
+                    Add(entryName, new ZipModAsset(this, entry.FullName));
+                }
+            }
+        }
+
+        public Stream Open(string path) {
+            lock (zip) {
+                ZipArchiveEntry entry = zip.GetEntry(path);
+                if (entry == null) throw new KeyNotFoundException($"File {path} not found in archive {Path}");
+                return new SynchronizedZipEntryStream(entry);
             }
         }
 
         protected override void Dispose(bool disposing) {
-            base.Dispose(disposing);
-            Zip.Dispose();
-            foreach (ZipPoolEntry pooled in Pool) {
-                Interlocked.Exchange(ref pooled.Value, null)?.Dispose();
+            lock (zip) {
+                base.Dispose(disposing);
+                zip.Dispose();
             }
         }
     }
@@ -715,6 +646,7 @@ namespace Celeste.Mod {
             /// Subscribe to this event to register your own custom types.
             /// </summary>
             public static event TypeGuesser OnGuessType;
+
             /// <summary>
             /// Guess the file type and format based on its path.
             /// </summary>
@@ -918,8 +850,7 @@ namespace Celeste.Mod {
                 ReadOnlySpan<char> fileName,
                 ReadOnlySpan<char> expectedExtension,
                 ref bool warningAlreadySent,
-                bool isTextBased = false)
-            {
+                bool isTextBased = false) {
                 ReadOnlySpan<char> extension = Path.GetExtension(fileName);
 
                 if (extension.IsEmpty)
@@ -980,8 +911,7 @@ namespace Celeste.Mod {
                 ReadOnlySpan<char> fileName,
                 ReadOnlySpan<char> expectedExtension,
                 ref bool warningAlreadySent,
-                bool isTextBased = false)
-            {
+                bool isTextBased = false) {
                 // use the simpler function if this is just a singlepart extension
                 if (expectedExtension.IndexOf('.') == -1)
                     return MatchExtension(filePath, fileName, expectedExtension, ref warningAlreadySent, isTextBased);
@@ -1055,6 +985,7 @@ namespace Celeste.Mod {
             /// Invoked when content is being updated, allowing you to handle it.
             /// </summary>
             public static event Action<ModAsset, ModAsset> OnUpdate;
+
             public static void Update(ModAsset prev, ModAsset next) {
                 if (prev != null) {
                     foreach (object target in prev.Targets) {
@@ -1195,6 +1126,7 @@ namespace Celeste.Mod {
             /// Invoked when content is being processed (most likely on load), allowing you to manipulate it.
             /// </summary>
             public static event Action<object, string> OnProcessLoad;
+
             /// <summary>
             /// Process an asset and register it for further reprocessing in the future.
             /// Apply any mod-related changes to the asset based on the existing mod asset meta map.
@@ -1230,6 +1162,7 @@ namespace Celeste.Mod {
             /// Invoked when content is being processed (most likely on load or runtime update), allowing you to manipulate it.
             /// </summary>
             public static event Action<object, ModAsset, bool> OnProcessUpdate;
+
             public static void ProcessUpdate(object asset, ModAsset mapping, bool load) {
                 if (asset == null || mapping == null)
                     return;
