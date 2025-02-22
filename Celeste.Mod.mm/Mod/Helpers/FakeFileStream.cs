@@ -61,6 +61,10 @@ namespace Celeste.Mod.Helpers {
             return Inner.Read(buffer, offset, count);
         }
 
+        public override int Read(Span<byte> buffer) {
+            return Inner.Read(buffer);
+        }
+
         public override long Seek(long offset, SeekOrigin origin) {
             return Inner.Seek(offset, origin);
         }
