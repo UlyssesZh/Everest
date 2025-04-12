@@ -589,7 +589,7 @@ namespace Celeste {
             GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
 
             // if we are not entering PICO-8 or the Reflection Fall cutscene...
-            if (!(patch_Engine.NextScene is Pico8.Emulator) && !(patch_Engine.NextScene is OverworldReflectionsFall)) {
+            if (patch_Engine.NextScene is not Pico8.Emulator && patch_Engine.NextScene is not OverworldReflectionsFall) {
                 // break all links between this level and its entities.
                 foreach (Entity entity in Entities) {
                     ((patch_Entity) entity).DissociateFromScene();
