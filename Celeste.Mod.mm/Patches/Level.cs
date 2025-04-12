@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -581,6 +582,11 @@ namespace Celeste {
         public extern void orig_End();
         public override void End() {
             orig_End();
+
+            // reload the vanilla Portraits.xml in case it was overridden by a map
+            // else, if the Portraits.xml doesn't have portrait_madeline defined,
+            // the game will crash when trying to load a save file (since it shows madeline's portrait)
+            GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
 
             // if we are not entering PICO-8 or the Reflection Fall cutscene...
             if (!(patch_Engine.NextScene is Pico8.Emulator) && !(patch_Engine.NextScene is OverworldReflectionsFall)) {
