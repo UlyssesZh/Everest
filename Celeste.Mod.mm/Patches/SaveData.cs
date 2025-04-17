@@ -485,7 +485,7 @@ namespace Celeste {
                     if (UnlockedAreas_Unsafe < lastCompleted + 1 && set.MaxArea >= lastCompleted + 1) {
                         UnlockedAreas_Unsafe = lastCompleted + 1;
                     }
-                    if (DebugMode) {
+                    if (DebugMode || CheatMode) {
                         UnlockedAreas_Unsafe = set.MaxArea;
                     }
 
@@ -493,7 +493,7 @@ namespace Celeste {
                     if (set.UnlockedAreas < lastCompleted + 1 && set.MaxArea >= lastCompleted + 1) {
                         set.UnlockedAreas = lastCompleted + 1;
                     }
-                    if (DebugMode) {
+                    if (DebugMode || CheatMode) {
                         set.UnlockedAreas = set.MaxArea;
                     }
                 }
