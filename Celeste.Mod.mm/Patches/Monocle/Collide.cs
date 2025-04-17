@@ -15,19 +15,13 @@ public static class patch_Collide {
     
     [MonoModReplace]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Check(Entity a, IEnumerable<Entity> b) {
-        return First(a, b) != null;
-    }
+    public static bool Check(Entity a, IEnumerable<Entity> b) => First(a, b) != null;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Check(Entity a, List<Entity> b) {
-        return First(a, CollectionsMarshal.AsSpan(b)) != null;
-    }
+    public static bool Check(Entity a, List<Entity> b) => First(a, CollectionsMarshal.AsSpan(b)) != null;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Check(Entity a, ReadOnlySpan<Entity> b) {
-        return First(a, b) != null;
-    }
+    public static bool Check(Entity a, ReadOnlySpan<Entity> b) => First(a, b) != null;
         
     [MonoModReplace]
     public static Entity First(Entity a, IEnumerable<Entity> b) {
@@ -52,7 +46,8 @@ public static class patch_Collide {
             
         return null;
     }
-        
+
+    [MonoModReplace]
     public static List<Entity> All(Entity a, IEnumerable<Entity> b, List<Entity> into) {
         if (TryGetSpan(b, out var span))
             return All(a, span, into);
@@ -63,6 +58,9 @@ public static class patch_Collide {
             
         return into;
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static List<Entity> All(Entity a, List<Entity> b, List<Entity> into) => All(a, CollectionsMarshal.AsSpan(b), into);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static List<Entity> All(Entity a, ReadOnlySpan<Entity> b, List<Entity> into) {
@@ -80,8 +78,8 @@ public static class patch_Collide {
         // Unsafe casts from the original method seem to not matter on .net7, though they do matter on newer runtimes.
         
         // Use `GetType() == typeof(...)` rather than `is` to avoid cast helpers.  This is measurably cheaper
-        // but does mean we could end up missing some rare cases where we could get a span but don't (e.g. a uint[]
-        // masquerading as an int[]).  That's an acceptable tradeoff.
+        // but does mean we could end up missing some rare cases where we could get a span but don't (e.g. a DerivedFromEntity[]
+        // masquerading as an Entity[]).  That's an acceptable tradeoff.
         
         bool result = true;
         if (source.GetType() == typeof(List<Entity>)) {
