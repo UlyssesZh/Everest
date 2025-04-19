@@ -432,10 +432,8 @@ namespace Celeste.Mod {
             // Before even initializing anything else, make sure to prepare any static flags.
             Flags.Initialize();
 
-            if (!Flags.IsHeadless) {
-                // Initialize the content helper.
-                Content.Initialize();
-            }
+            // Initialize the content helper.
+            Content.Initialize();
 
             MainThreadHelper.Instance = new MainThreadHelper(Celeste.Instance);
             STAThreadHelper.Instance = new STAThreadHelper(Celeste.Instance);
@@ -464,10 +462,8 @@ namespace Celeste.Mod {
 
             Loader.LoadAuto();
 
-            if (!Flags.IsHeadless) {
-                // Load stray .bins afterwards.
-                Content.Crawl(new MapBinsInModsModContent(Path.Combine(PathEverest, "Mods")));
-            }
+            // Load stray .bins afterwards.
+            Content.Crawl(new MapBinsInModsModContent(Path.Combine(PathEverest, "Mods")));
 
             // Also let all mods parse the arguments.
             Queue<string> args = new Queue<string>(Args);
