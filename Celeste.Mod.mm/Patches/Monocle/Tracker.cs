@@ -6,6 +6,7 @@ using MonoMod;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Monocle {
     /// <summary>
@@ -143,11 +144,18 @@ namespace Monocle {
                 tracked.Add(type, value);
             }
             int cnt = value.Count;
+            value.Add(trackedAsType);
             value.AddRange(tracked.TryGetValue(trackedAsType, out List<Type> list) ? list : new List<Type>());
             List<Type> result = tracked[type] = value.Distinct().ToList();
             return cnt != result.Count;
         }
 
+        [MonoModIgnore]
+        internal extern void EntityAdded(Entity entity);
+
+        [MonoModIgnore]
+        internal extern void ComponentAdded(Component component);
+        
         /// <summary>
         /// Ensures the <paramref name="scene"/>'s tracker contains all entities of all tracked Types from the <paramref name="scene"/>.
         /// Must be called if a type is added to the tracker manually and if the <paramref name="scene"/>'s Tracker isn't refreshed.
@@ -158,39 +166,28 @@ namespace Monocle {
         /// </summary>
         public static void Refresh(Scene scene = null, bool force = false) {
             Scene sceneUpdate = scene ?? Engine.Scene;
-            if ((sceneUpdate.Tracker as patch_Tracker).currentVersion >= TrackedTypeVersion && !force) {
+
+            var tracker = (sceneUpdate.Tracker as patch_Tracker)!;
+            if (tracker.currentVersion >= TrackedTypeVersion && !force) {
                 return;
             }
-            (sceneUpdate.Tracker as patch_Tracker).currentVersion = TrackedTypeVersion;
+            tracker.currentVersion = TrackedTypeVersion;
             foreach (Type entityType in StoredEntityTypes) {
-                if (!sceneUpdate.Tracker.Entities.ContainsKey(entityType)) {
-                    sceneUpdate.Tracker.Entities.Add(entityType, new List<Entity>());
-                }
+                ref var list = ref CollectionsMarshal.GetValueRefOrAddDefault(tracker.Entities, entityType, out _);
+                list ??= new();
+                list.Clear();
             }
             foreach (Type componentType in StoredComponentTypes) {
-                if (!sceneUpdate.Tracker.Components.ContainsKey(componentType)) {
-                    sceneUpdate.Tracker.Components.Add(componentType, new List<Component>());
-                }
+                ref var list = ref CollectionsMarshal.GetValueRefOrAddDefault(tracker.Components, componentType, out _);
+                list ??= new();
+                list.Clear();
             }
+            
             foreach (Entity entity in sceneUpdate.Entities) {
                 foreach (Component component in entity.Components) {
-                    Type componentType = component.GetType();
-                    if (!TrackedComponentTypes.TryGetValue(componentType, out List<Type> componentTypes)
-                        || sceneUpdate.Tracker.Components[componentType].Contains(component)) {
-                        continue;
-                    }
-                    foreach (Type trackedType in componentTypes) {
-                        sceneUpdate.Tracker.Components[trackedType].Add(component);
-                    }
+                    tracker.ComponentAdded(component);
                 }
-                Type entityType = entity.GetType();
-                if (!TrackedEntityTypes.TryGetValue(entityType, out List<Type> entityTypes)
-                    || sceneUpdate.Tracker.Entities[entityType].Contains(entity)) {
-                    continue;
-                }
-                foreach (Type trackedType in entityTypes) {
-                    sceneUpdate.Tracker.Entities[trackedType].Add(entity);
-                }
+                tracker.EntityAdded(entity);
             }
         }
     }
