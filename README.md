@@ -29,7 +29,7 @@ For information about mod development, check out the [Everest Wiki](https://gith
 - Open the .sln in the repo with Visual Studio
 - Publish all projects
     - **NOTE:** It is very important that you *publish* the project instead of simply building it, as otherwise required dependency DLLs won't be copied!
-- Copy everything in `MiniInstaller\bin\Release\net7.0\publish` and `Celeste.Mod.mm\bin\Release\net7.0\publish` to your Celeste directory, replacing existing files
+- Copy everything in `MiniInstaller\bin\Release\net8.0\publish` and `Celeste.Mod.mm\bin\Release\net8.0\publish` to your Celeste directory, replacing existing files
 - Run MiniInstaller-win64.exe on 64-bit or MiniInstaller-win.exe on 32-bit
 
 ### macOS / Linux
@@ -38,7 +38,7 @@ For information about mod development, check out the [Everest Wiki](https://gith
     - _With MonoDevelop:_ Open the .sln in the repo with MonoDevelop
     - _Manually:_ Open the terminal in the Everest directory and run `msbuild` or `dotnet publish`
     - **NOTE:** It is very important that you *publish* the project instead of simply building it, as otherwise required dependency DLLs won't be copied!
-- Copy everything in `MiniInstaller/bin/Release/net7.0/publish` and `Celeste.Mod.mm/bin/Release/net7.0/publish` to your Celeste directory
+- Copy everything in `MiniInstaller/bin/Release/net8.0/publish` and `Celeste.Mod.mm/bin/Release/net8.0/publish` to your Celeste directory
     - macOS: `Celeste.app/Contents/Resources`
 - Run `./MiniInstaller-linux` or `./MiniInstaller-osx`
 
