@@ -657,7 +657,7 @@ namespace Celeste.Mod.Core {
             TextMenu.Item masterSwitch = new TextMenu.OnOff(Dialog.Clean("modoptions_coremodule_discordrichpresence"), DiscordRichPresence)
                 .Change(value => {
                     DiscordRichPresence = value;
-                    if (DiscordRichPresence) {
+                    if (DiscordRichPresence && !Everest.Flags.IsHeadless) {
                         Everest.DiscordSDK.CreateInstance()?.UpdatePresence(session);
                     } else {
                         Everest.DiscordSDK.Instance?.Dispose();
