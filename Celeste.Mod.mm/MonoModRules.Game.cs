@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
-using Monocle;
 using MonoMod.Cil;
 using MonoMod.InlineRT;
 using MonoMod.Utils;
@@ -155,32 +154,20 @@ namespace MonoMod {
             if (IsRelinkingXNAInstall)
                 modder.Log("[Celeste.Mod.mm] Converting XNA game install to FNA");
 
-            MethodReference stubAttrCtor = RulesModule.GetType($"MonoMod.{nameof(PatchStubExternAttribute)}").Methods.First(m => m.IsConstructor);
-            stubAttrCtor = modder.Module.ImportReference(stubAttrCtor);
-
-            static void VisitType(TypeDefinition type, MethodReference stubAttrCtor) {
+            static void VisitType(TypeDefinition type) {
                 // Remove readonly attribute from all static fields
                 // This "fixes" https://github.com/dotnet/runtime/issues/11571, which breaks some mods
                 foreach (FieldDefinition field in type.Fields)
                     if ((field.Attributes & FieldAttributes.Static) != 0)
                         field.Attributes &= ~FieldAttributes.InitOnly;
 
-                // Stub out extern FMOD methods in headless mode
-                if (MonoModRule.Flag.Get("Headless") && type.Namespace.StartsWith("FMOD")) {
-                    foreach (MethodDefinition method in type.Methods) {
-                        if ((method.Attributes & MethodAttributes.Static) != 0 && method.Name.StartsWith("FMOD_")) {
-                            method.CustomAttributes.Add(new CustomAttribute(stubAttrCtor));
-                        }
-                    }
-                }
-
                 // Visit nested types
                 foreach (TypeDefinition nestedType in type.NestedTypes)
-                    VisitType(nestedType, stubAttrCtor);
+                    VisitType(nestedType);
             }
 
             foreach (TypeDefinition type in modder.Module.Types)
-                VisitType(type, stubAttrCtor);
+                VisitType(type);
         }
 
         public static void GamePostProcessor(MonoModder modder) {

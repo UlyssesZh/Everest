@@ -102,7 +102,7 @@ namespace Monocle {
                         }
                     }
 
-                    if (!MainThreadHelper.IsMainThread) {
+                    if (!MainThreadHelper.IsMainThread) { 
                         // Otherwise wait for it to get loaded. (Don't wait locked!)
                         return _Texture_QueuedLoad.Result;
                     }
@@ -290,10 +290,8 @@ namespace Monocle {
         internal patch_VirtualTexture(string path) {
             Path = path;
             Name = path;
-            if (!Preload(force: Everest.Flags.IsHeadless) && !Everest.Flags.IsHeadless)
+            if (!Preload())
                 Reload();
-            if (Everest.Flags.IsHeadless)
-                Texture_Unsafe = new Texture2D(Engine.Graphics.GraphicsDevice, Width, Height);
         }
 
         [MonoModConstructor]
@@ -303,20 +301,16 @@ namespace Monocle {
             Width = width;
             Height = height;
             this.color = color;
-            if (!Preload(force: Everest.Flags.IsHeadless) && !Everest.Flags.IsHeadless)
+            if (!Preload())
                 Reload();
-            if (Everest.Flags.IsHeadless)
-                Texture_Unsafe = new Texture2D(Engine.Graphics.GraphicsDevice, Width, Height);
         }
 
         [MonoModConstructor]
         internal patch_VirtualTexture(ModAsset metadata) {
             Metadata = metadata;
             Name = metadata.PathVirtual;
-            if (!Preload(force: Everest.Flags.IsHeadless) && !Everest.Flags.IsHeadless)
+            if (!Preload())
                 Reload();
-            if (Everest.Flags.IsHeadless)
-                Texture_Unsafe = new Texture2D(Engine.Graphics.GraphicsDevice, Width, Height);
         }
 
         [MonoModReplace]
@@ -368,7 +362,7 @@ namespace Monocle {
             }
         }
 
-        internal bool LoadImmediately =>
+        internal bool LoadImmediately => 
             !_Texture_FTLLoading && ((CoreModule.Settings.ThreadedGL ?? Everest.Flags.PreferThreadedGL) || MainThreadHelper.IsMainThread);
         internal bool Load(bool wait, Func<Texture2D> load) {
             if (LoadImmediately) {
@@ -427,11 +421,6 @@ namespace Monocle {
         [MonoModReplace]
         [PatchInitblk]
         internal override unsafe void Reload() {
-            if (Everest.Flags.IsHeadless) {
-                Texture_Unsafe = new Texture2D(Engine.Graphics.GraphicsDevice, 1, 1);
-                return;
-            }
-
             // Unload task might end up conflicting with Reload - let's instead force-unload in Load.
             // Unload();
 

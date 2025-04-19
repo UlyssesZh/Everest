@@ -56,7 +56,7 @@ namespace Monocle {
         [PatchErrorLogOpen]
         public static extern void orig_Open();
         public static void Open() {
-            if (Environment.GetEnvironmentVariable("EVEREST_NO_ERRORLOG_ON_CRASH") != "1" && CoreModule.Settings.OpenErrorLogOnCrash && !Everest.Flags.IsHeadless)
+            if (Environment.GetEnvironmentVariable("EVEREST_NO_ERRORLOG_ON_CRASH") != "1" && CoreModule.Settings.OpenErrorLogOnCrash)
                 orig_Open();
         }
 

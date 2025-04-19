@@ -327,7 +327,7 @@ namespace Celeste.Mod.UI {
         }
 
         public override bool IsStart(Overworld overworld, Overworld.StartMode start) {
-            if (start != Overworld.StartMode.Titlescreen || Everest.Flags.IsHeadless)
+            if (start != Overworld.StartMode.Titlescreen)
                 return false;
             if (CoreModule.Settings.CurrentVersion != null) {
                 if (CoreModule.Settings.SaveDataFlush ?? false)
