@@ -119,14 +119,14 @@ namespace Monocle {
             }
             bool updated = false;
             // copy the registered types for the target type
-            (trackedEntity ? StoredEntityTypes : StoredComponentTypes).Add(type);
+            var knownTypes = trackedEntity ? StoredEntityTypes : StoredComponentTypes;
             Dictionary<Type, List<Type>> tracked = trackedEntity ? TrackedEntityTypes : TrackedComponentTypes;
-            if (AddSpecificType(type, trackedAsType, tracked)) {
+            if (AddSpecificType(type, trackedAsType, tracked, knownTypes)) {
                 updated = true;
             }
             // do the same for subclasses
             foreach (Type subtype in subtypes) {
-                if (trackedAsType.IsAssignableFrom(subtype) && AddSpecificType(subtype, trackedAsType, tracked)) {
+                if (trackedAsType.IsAssignableFrom(subtype) && AddSpecificType(subtype, trackedAsType, tracked, knownTypes)) {
                     updated = true;
                 }
             }
@@ -135,10 +135,15 @@ namespace Monocle {
             }
         }
 
-        private static bool AddSpecificType(Type type, Type trackedAsType, Dictionary<Type, List<Type>> tracked) {
+        private static bool AddSpecificType(Type type, Type trackedAsType, Dictionary<Type, List<Type>> tracked, HashSet<Type> knownTypes) {
             if (type.IsAbstract) {
                 return false;
             }
+
+            // Make sure the tracker knows about both the type and trackedAs type, to fix scenarios like `[TrackedAs(typeof(UntrackedType))]`
+            knownTypes.Add(type);
+            knownTypes.Add(trackedAsType);
+            
             if (!tracked.TryGetValue(type, out List<Type> value)) {
                 value = new List<Type>();
                 tracked.Add(type, value);
