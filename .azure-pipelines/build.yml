@@ -10,7 +10,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  runtimeVersion: 'net7.0' # Must match TargetFramework in the csprojs
+  runtimeVersion: 'net8.0' # Must match TargetFramework in the csprojs
   VANILLA_CACHE: $(Pipeline.Workspace)/vanilla
 
 name: '$(Build.BuildId)+$(Build.BuildIdOffset)'
