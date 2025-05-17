@@ -1,5 +1,3 @@
-#pragma warning disable CS0626 // Method, operator, or accessor is marked external and has no attributes on it
-
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -16,6 +14,9 @@ namespace Celeste {
         }
 
         public class patch_TalkComponentUI : TalkComponentUI {
+            // use the same collision as the TalkComponent entity
+            // (see https://github.com/EverestAPI/Everest/issues/759)
+
             private float alpha;
             private float slide;
             private float timer;
@@ -26,22 +27,28 @@ namespace Celeste {
                 // no-op. MonoMod ignores this - we only need this to make the compiler happy.
             }
 
-            public extern void orig_Awake(Scene scene);
+            [MonoModLinkTo("Monocle.Entity", "Awake")]
+            [MonoModIgnore]
+            public extern void base_Awake(Scene scene);
+            [MonoModReplace]
             public override void Awake(Scene scene) {
-                orig_Awake(scene);
+                base_Awake(scene);
                 if (Handler.Entity == null || Scene.CollideCheck<FakeWall>(new Rectangle((int)(Handler.Entity.X + Handler.Bounds.X), (int)(Handler.Entity.Y + Handler.Bounds.Y), Handler.Bounds.Width, Handler.Bounds.Height))) {
                     alpha = 0f;
                 }
             }
 
-            public extern void orig_Update();
+            [MonoModLinkTo("Monocle.Entity", "Update")]
+            [MonoModIgnore]
+            public extern void base_Update();
+            [MonoModReplace]
             public override void Update() {
                 timer += Engine.DeltaTime;
                 slide = Calc.Approach(slide, Display ? 1 : 0, Engine.DeltaTime * 4f);
                 if (alpha < 1f && Handler.Entity != null && !Scene.CollideCheck<FakeWall>(new Rectangle((int)(Handler.Entity.X + Handler.Bounds.X), (int)(Handler.Entity.Y + Handler.Bounds.Y), Handler.Bounds.Width, Handler.Bounds.Height))) {
                     alpha = Calc.Approach(alpha, 1f, 2f * Engine.DeltaTime);
                 }
-                orig_Update();
+                base_Update();
             }
         }
     }
