@@ -53,7 +53,9 @@ When making a pull request, please note the following guidelines:
 - **Testing:** if you are submitting a bugfix, describe the issue thouroughly and provide recreation steps, *especially* if it is not an existing [issue](https://github.com/EverestAPI/Everest/issues).
 - **Response:** when you submit a pull request, you are responsible for making sure any questions and change requests on it are answered in a timely manner.
 
-Once submitted, your pull request is reviewed by the members of the Everest team. In order to get merged, it should be approved by at least **2 members** since at least **5 days**. Pull requests are also not merged if a new release is planned to happen in 5 days or less, the date of the next release can be found [in the Milestones section](https://github.com/EverestAPI/Everest/milestones).
+Once everything is ready, for it to get merged it will need to get reviewed by at least **2 members** of the Everest team. Once that has happened, there is a **5 day** last-call window in which any concerns can be brought up before it is merged. If nothing is blocking the pull request, it'll get merged once the 5 day window is over.  
+
+If a pull request would be merged within 5 days of a planned release, it will have to be merged **after** it, to ensure it has enough time to be tested before being released. The date of the next release can be found [in the Milestones section](https://github.com/EverestAPI/Everest/milestones).
 
 # Making Changes
 These are explanations and guidelines for how to make changes to the Everest source code.
