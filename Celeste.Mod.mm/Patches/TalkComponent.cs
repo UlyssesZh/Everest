@@ -14,8 +14,6 @@ namespace Celeste {
         }
 
         public class patch_TalkComponentUI : TalkComponentUI {
-            // use the same collision as the TalkComponent entity
-            // (see https://github.com/EverestAPI/Everest/issues/759)
 
             private float alpha;
             private float slide;
@@ -33,8 +31,14 @@ namespace Celeste {
             [MonoModReplace]
             public override void Awake(Scene scene) {
                 base_Awake(scene);
-                if (Handler.Entity == null || Scene.CollideCheck<FakeWall>(new Rectangle((int)(Handler.Entity.X + Handler.Bounds.X), (int)(Handler.Entity.Y + Handler.Bounds.Y), Handler.Bounds.Width, Handler.Bounds.Height))) {
+                // use Collider instead of Position, as Position behaves wrongly
+                // (see https://github.com/EverestAPI/Everest/issues/759)
+                if (Handler.Entity == null || Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
                     alpha = 0f;
+                }
+                // force alpha if the player can interact
+                if (Highlighted) {
+                    alpha = 1f;
                 }
             }
 
@@ -45,8 +49,14 @@ namespace Celeste {
             public override void Update() {
                 timer += Engine.DeltaTime;
                 slide = Calc.Approach(slide, Display ? 1 : 0, Engine.DeltaTime * 4f);
-                if (alpha < 1f && Handler.Entity != null && !Scene.CollideCheck<FakeWall>(new Rectangle((int)(Handler.Entity.X + Handler.Bounds.X), (int)(Handler.Entity.Y + Handler.Bounds.Y), Handler.Bounds.Width, Handler.Bounds.Height))) {
+                // use Collider instead of Position, as Position behaves wrongly
+                // (see https://github.com/EverestAPI/Everest/issues/759)
+                if (alpha < 1f && Handler.Entity != null && !Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
                     alpha = Calc.Approach(alpha, 1f, 2f * Engine.DeltaTime);
+                }
+                // force alpha if the player can interact
+                if (Highlighted) {
+                    alpha = 1f;
                 }
                 base_Update();
             }
