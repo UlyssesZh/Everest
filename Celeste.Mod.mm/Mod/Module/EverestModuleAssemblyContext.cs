@@ -216,20 +216,10 @@ namespace Celeste.Mod {
         /// <returns>The calculated checksums for the file.</returns>
         public AsmChecksums CalcAssemblyCacheChecksums(string path, string symPath) {
             Dictionary<string, string> depChecksums = new();
-            foreach (EverestModuleMetadata depMeta in ModuleMeta.Dependencies) {
-                if (depMeta.Name == CoreModule.NETCoreMetaName || depMeta.Name == "Everest") continue;
-                EverestModule actualModule = Everest.Modules.FirstOrDefault(m => m.Metadata.Name == depMeta.Name, null);
-                if (actualModule == null) continue;
-                depChecksums[depMeta.Name] = actualModule.Metadata.Hash.ToHexadecimalString();
-            }
+            FillChecksums(depChecksums, ModuleMeta.Dependencies);
             
             Dictionary<string, string> optDepChecksums = new();
-            foreach (EverestModuleMetadata optDepMeta in ModuleMeta.OptionalDependencies) {
-                if (optDepMeta.Name == CoreModule.NETCoreMetaName || optDepMeta.Name == "Everest") continue;
-                EverestModule actualModule = Everest.Modules.FirstOrDefault(m => m.Metadata.Name == optDepMeta.Name, null);
-                if (actualModule == null) continue;
-                optDepChecksums[optDepMeta.Name] = actualModule.Metadata.Hash.ToHexadecimalString();
-            }
+            FillChecksums(optDepChecksums, ModuleMeta.OptionalDependencies);
             
             return new AsmChecksums(
                 Everest.Relinker.GameChecksum, 
@@ -237,6 +227,15 @@ namespace Celeste.Mod {
                 symPath != null ? CalcChecksumForFile(symPath) : "",
                 depChecksums,
                 optDepChecksums);
+
+            static void FillChecksums(Dictionary<string, string> dict, List<EverestModuleMetadata> deps) {
+                foreach (EverestModuleMetadata depMeta in deps) {
+                    if (depMeta.Name == CoreModule.NETCoreMetaName || depMeta.Name == "Everest") continue;
+                    EverestModule actualModule = Everest.Modules.FirstOrDefault(m => m.Metadata.Name == depMeta.Name, null);
+                    if (actualModule == null) continue;
+                    dict[depMeta.Name] = actualModule.Metadata.Hash.ToHexadecimalString();
+                }
+            }
         }
 
         /// <summary>
@@ -263,15 +262,20 @@ namespace Celeste.Mod {
                 lines.Add(FileChecksum);
                 lines.Add(SymFileChecksum ?? "");
 
-                foreach ((string metaName, string hash) in DepHashes) {
-                    lines.Add($"{metaName}:{hash}");
-                }
+                WriteAsLines(DepHashes);
+                
                 lines.Add("");
-
-                foreach ((string metaName, string hash) in OptDepHashes) {
-                    lines.Add($"{metaName}:{hash}");
-                }
+                
+                WriteAsLines(OptDepHashes);
+                
                 File.WriteAllLines(path, lines);
+                return;
+
+                void WriteAsLines(Dictionary<string, string> dict) {
+                    foreach ((string metaName, string hash) in dict) {
+                        lines.Add($"{metaName}:{hash}");
+                    }
+                }
             }
 
             /// <summary>
@@ -344,33 +348,28 @@ namespace Celeste.Mod {
                 if (FileChecksum != other.FileChecksum) return false;
                 if (SymFileChecksum != other.SymFileChecksum) return false;
 
-                // A null list indicates no dependencies, thus, it always satisfies the requirements
-                if (DepHashes != null) {
-                    if (other.DepHashes != null) {
-                        foreach ((string metaName, string hash) in DepHashes) {
-                            if (!other.DepHashes.TryGetValue(metaName, out string otherHash)) {
-                                return false;
-                            }
-                            if (hash != otherHash) return false;
-                        }
-                    } else if (DepHashes.Count != 0) 
-                        // Having an empty and null list should be equivalent
-                        return false;
-                }
+                if (!Check(DepHashes, other.DepHashes)) return false;
 
-                if (OptDepHashes != null) {
-                    if (other.OptDepHashes != null) {
-                        foreach ((string metaName, string hash) in OptDepHashes) {
-                            if (!other.OptDepHashes.TryGetValue(metaName, out string otherHash)) {
-                                return false;
-                            }
-                            if (hash != otherHash) return false;
-                        }
-                    } else if (OptDepHashes.Count != 0)
-                        return false;
-                }
+                if (!Check(OptDepHashes, other.OptDepHashes)) return false;
 
                 return true;
+
+                static bool Check(Dictionary<string, string> dict, Dictionary<string, string> otherDict) {
+                    // A null list indicates no dependencies, thus, it always satisfies the requirements
+                    if (dict != null) {
+                        if (otherDict != null) {
+                            foreach ((string metaName, string hash) in dict) {
+                                if (!otherDict.TryGetValue(metaName, out string otherHash)) {
+                                    return false;
+                                }
+                                if (hash != otherHash) return false;
+                            }
+                        } else if (dict.Count != 0)
+                            // Having an empty and null list should be equivalent
+                            return false;
+                    }
+                    return true;
+                }
             }
         }
 
