@@ -31,7 +31,7 @@ namespace Celeste {
             [MonoModReplace]
             public override void Awake(Scene scene) {
                 base_Awake(scene);
-                if (Handler.Entity.Collider != null) {
+                if (Handler.Entity?.Collider != null) {
                     // use Collider if available instead of Position, as Position behaves wrongly
                     // (see https://github.com/EverestAPI/Everest/issues/759)
                     if (Handler.Entity == null || Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
@@ -56,7 +56,7 @@ namespace Celeste {
             public override void Update() {
                 timer += Engine.DeltaTime;
                 slide = Calc.Approach(slide, Display ? 1 : 0, Engine.DeltaTime * 4f);
-                if (Handler.Entity.Collider != null) {
+                if (Handler.Entity?.Collider != null) {
                     // use Collider if available instead of Position, as Position behaves wrongly
                     // (see https://github.com/EverestAPI/Everest/issues/759)
                     if (alpha < 1f && Handler.Entity != null && !Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
