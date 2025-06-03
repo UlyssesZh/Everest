@@ -34,7 +34,7 @@ namespace Celeste {
                 if (Handler.Entity?.Collider != null) {
                     // use Collider if available instead of Position, as Position behaves wrongly
                     // (see https://github.com/EverestAPI/Everest/issues/759)
-                    if (Handler.Entity == null || Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
+                    if (Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
                         alpha = 0f;
                     }
                 } else {
@@ -59,7 +59,7 @@ namespace Celeste {
                 if (Handler.Entity?.Collider != null) {
                     // use Collider if available instead of Position, as Position behaves wrongly
                     // (see https://github.com/EverestAPI/Everest/issues/759)
-                    if (alpha < 1f && Handler.Entity != null && !Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
+                    if (alpha < 1f && !Scene.CollideCheck<FakeWall>(Handler.Entity.Collider.Bounds)) {
                         alpha = Calc.Approach(alpha, 1f, 2f * Engine.DeltaTime);
                     }
                 } else {
