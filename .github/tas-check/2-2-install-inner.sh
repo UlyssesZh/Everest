@@ -21,13 +21,13 @@ chmod -v u+x MiniInstaller-linux
 
 # download TAS files
 cd ..
-curl --fail -Lo t.zip "https://celestemodupdater.0x0a.de/pinned-mods/TAS-Files-${TAS_TO_RUN}.zip"
+curl --fail -Lo t.zip "${TAS_FILES_URL}"
 unzip t.zip
 rm -v t.zip
 
-# install CelesteTAS (https://maddie480.ovh/celeste/dl?id=CelesteTAS&mirror=1)
+# install CelesteTAS
 cd celeste/Mods
-curl --fail -Lo CelesteTAS.zip "https://celestemodupdater.0x0a.de/pinned-mods/CelesteTAS.zip"
+curl --fail -Lo CelesteTAS.zip "https://github.com/EverestAPI/CelesteTAS-EverestInterop/releases/download/v3.45.1/CelesteTAS.zip"
 
 # install the mod that is going to be TASed, downloaded as a bundle zip containing the mod zip
 # and all of its dependencies (https://maddie480.ovh/celeste/bundle-download?id=${TAS_TO_RUN})

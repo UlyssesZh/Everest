@@ -15,5 +15,5 @@ while [ "${BUILD_ID}" == "" ]; do
 	BUILD_ID=`get_build_id "$1"`
 done
 
-mkdir /tmp/everest-pr-tas-check
+mkdir -p /tmp/everest-pr-tas-check
 echo -n "https://dev.azure.com/EverestAPI/Everest/_apis/build/builds/${BUILD_ID}/artifacts?artifactName=main&api-version=5.0&%24format=zip" > /tmp/everest-pr-tas-check/download-link.txt
