@@ -11,4 +11,4 @@ docker run \
 	--sync-check-file "/home/ubuntu/$1" \
 	--sync-check-result /home/ubuntu/tas/result.json
 
-[ "`jq -r '.entries.[].status' /tmp/everest-pr-tas-check/result.json`" == "success" ]
+[ "`jq -r '.entries[].status' /tmp/everest-pr-tas-check/result.json`" == "success" ]

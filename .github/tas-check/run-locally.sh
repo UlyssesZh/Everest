@@ -16,8 +16,8 @@ case "$1" in
         ;;
 
     "StrawberryJam2021")
-        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/0f0c6ee2112a2189b8d574704028db2fd37ee05e.zip"
-        TAS_PATH="StrawberryJamTAS-0f0c6ee2112a2189b8d574704028db2fd37ee05e/0-SJ All Levels.tas"
+        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/fc7397c26f4d15468d4a8a3e58e7cc3d62d21223.zip"
+        TAS_PATH="StrawberryJamTAS-fc7397c26f4d15468d4a8a3e58e7cc3d62d21223/0-SJ All Levels.tas"
         ;;
 
     *)

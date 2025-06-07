@@ -16,8 +16,8 @@ jobs:
 
           - name: Strawberry Jam All Levels
             mod: StrawberryJam2021
-            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/0f0c6ee2112a2189b8d574704028db2fd37ee05e.zip"
-            path: "StrawberryJamTAS-0f0c6ee2112a2189b8d574704028db2fd37ee05e/0-SJ All Levels.tas"
+            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/fc7397c26f4d15468d4a8a3e58e7cc3d62d21223.zip"
+            path: "StrawberryJamTAS-fc7397c26f4d15468d4a8a3e58e7cc3d62d21223/0-SJ All Levels.tas"
 
     runs-on: ubuntu-latest
     timeout-minutes: 60
