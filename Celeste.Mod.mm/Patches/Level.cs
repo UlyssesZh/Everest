@@ -583,13 +583,18 @@ namespace Celeste {
         public override void End() {
             orig_End();
 
-            // reload the vanilla Portraits.xml in case it was overridden by a map
-            // else, if the Portraits.xml doesn't have portrait_madeline defined,
-            // the game will crash when trying to load a save file (since it shows madeline's portrait)
-            GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
+            Scene nextScene = patch_Engine.NextScene;
+
+            if (nextScene is not (LevelLoader or patch_LevelExit { Mode: LevelExit.Mode.Restart or LevelExit.Mode.GoldenBerryRestart }
+                or Editor.MapEditor or AssetReloadHelper)) {
+                // reload the vanilla Portraits.xml when exiting
+                // else, if a map overrides the Portraits.xml and doesn't have portrait_madeline defined,
+                // the game will crash when trying to load a save file (since it shows madeline's portrait)
+                GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
+            }
 
             // if we are not entering PICO-8 or the Reflection Fall cutscene...
-            if (patch_Engine.NextScene is not (Pico8.Emulator or OverworldReflectionsFall)) {
+            if (nextScene is not (Pico8.Emulator or OverworldReflectionsFall)) {
                 // break all links between this level and its entities.
                 foreach (Entity entity in Entities) {
                     ((patch_Entity) entity).DissociateFromScene();

@@ -19,12 +19,18 @@ namespace Celeste {
     class patch_LevelExit : LevelExit {
 
         // We're effectively in LevelExit, but still need to "expose" private fields to our mod.
+        private Mode mode;
         private Session session;
         private XmlElement completeXml;
         private Atlas completeAtlas;
         private bool completeLoaded;
 
         private MapMetaCompleteScreen completeMeta;
+
+        // the mode field is private, but everest needs to access it
+        // however, making it public will break mods which use reflection to access the field...
+        // so we have no other option but to make a public property, oh well
+        public Mode Mode => mode;
 
         public patch_LevelExit(Mode mode, Session session, HiresSnow snow = null)
             : base(mode, session, snow) {
