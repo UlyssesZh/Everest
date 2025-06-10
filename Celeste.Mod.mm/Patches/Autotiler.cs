@@ -72,7 +72,6 @@ namespace Celeste {
             
             if (xml.HasAttr("sound")) {
                 SurfaceIndex.TileToIndex[xml.AttrChar("id")] = xml.AttrInt("sound");
-                // Could accommodate for no sound attr, but requiring it should improve clarity on user's end
                 if (xml.HasAttr("soundPath")) {
                     patch_SurfaceIndex.IndexToCustomPath[xml.AttrInt("sound")] = (xml.Attr("soundPath").StartsWith("event:/") ? "" : "event:/") + xml.Attr("soundPath");
                 }
