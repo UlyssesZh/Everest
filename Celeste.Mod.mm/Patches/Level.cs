@@ -585,8 +585,8 @@ namespace Celeste {
 
             Scene nextScene = patch_Engine.NextScene;
 
-            if (nextScene is not (LevelLoader or patch_LevelExit { Mode: LevelExit.Mode.Restart or LevelExit.Mode.GoldenBerryRestart }
-                or Editor.MapEditor or AssetReloadHelper)) {
+            if (nextScene is not (Editor.MapEditor or AssetReloadHelper or LevelLoader
+                or patch_LevelExit { Mode: LevelExit.Mode.Restart or LevelExit.Mode.GoldenBerryRestart })) {
                 // reload the vanilla Portraits.xml when exiting
                 // else, if a map overrides the Portraits.xml and doesn't have portrait_madeline defined,
                 // the game will crash when trying to load a save file (since it shows madeline's portrait)
