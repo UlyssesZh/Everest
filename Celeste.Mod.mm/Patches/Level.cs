@@ -585,11 +585,19 @@ namespace Celeste {
 
             Scene nextScene = patch_Engine.NextScene;
 
+            // reload the vanilla Portraits.xml when exiting; if a map overrides the Portraits.xml
+            // and doesn't have portrait_madeline defined, the game would crash when trying to load a save file
+            // (since it shows madeline's portrait)
+            //
+            // however we need to pay attention to the new scene, else we'll reload vanilla portraits too soon
+            // and make custom portraits stop working. therefore, we ignore these scenes as they don't actually
+            // exit the map:
+            // - MapEditor - debug map
+            // - AssetReloadHelper - f5 bind
+            // - LevelLoader - vanilla f1-f3 binds + everest softlock prevention
+            // - LevelExit (if Mode is Restart or GoldenBerryRestart) - restarts the level, duh
             if (nextScene is not (Editor.MapEditor or AssetReloadHelper or LevelLoader
                 or patch_LevelExit { Mode: LevelExit.Mode.Restart or LevelExit.Mode.GoldenBerryRestart })) {
-                // reload the vanilla Portraits.xml when exiting
-                // else, if a map overrides the Portraits.xml and doesn't have portrait_madeline defined,
-                // the game will crash when trying to load a save file (since it shows madeline's portrait)
                 GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
             }
 
