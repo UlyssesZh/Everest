@@ -16,8 +16,9 @@ case "$1" in
         ;;
 
     "StrawberryJam2021")
-        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/fc7397c26f4d15468d4a8a3e58e7cc3d62d21223.zip"
-        TAS_PATH="StrawberryJamTAS-fc7397c26f4d15468d4a8a3e58e7cc3d62d21223/0-SJ All Levels.tas"
+        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/c9c589a8ef225def5aca869cc1ed3eedf588ec14.zip"
+        TAS_PATH="StrawberryJamTAS-c9c589a8ef225def5aca869cc1ed3eedf588ec14/0-SJ All Levels.tas"
+        BUNDLE_DOWNLOAD="https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-134df0f4.zip"
         ;;
 
     *)
@@ -27,5 +28,5 @@ esac
 
 cd "`dirname "$0"`"
 ./1-get-build-url.sh "$2"
-./2-1-install.sh "$1" "${TAS_URL}"
+./2-1-install.sh "${TAS_URL}" "${BUNDLE_DOWNLOAD}"
 ./3-run.sh "${TAS_PATH}"

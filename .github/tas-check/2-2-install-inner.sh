@@ -31,7 +31,8 @@ curl --fail -Lo CelesteTAS.zip "https://github.com/EverestAPI/CelesteTAS-Everest
 
 # install the mod that is going to be TASed, downloaded as a bundle zip containing the mod zip
 # and all of its dependencies (https://maddie480.ovh/celeste/bundle-download?id=${TAS_TO_RUN})
-# for simplicity's sake, Celeste-Bundle.zip exists but is an empty zip
-curl --fail -Lo t.zip "https://celestemodupdater.0x0a.de/pinned-mods/${TAS_TO_RUN}-Bundle.zip"
-unzip t.zip
-rm -v t.zip
+if ! [ "${BUNDLE_DOWNLOAD_URL}" == "" ]; then
+    curl --fail -Lo t.zip "${BUNDLE_DOWNLOAD_URL}"
+    unzip t.zip
+    rm -v t.zip
+fi
