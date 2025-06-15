@@ -10,13 +10,18 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  runtimeVersion: 'net7.0' # Must match TargetFramework in the csprojs
+  runtimeVersion: 'net8.0' # Must match TargetFramework in the csprojs
   VANILLA_CACHE: $(Pipeline.Workspace)/vanilla
 
 name: '$(Build.BuildId)+$(Build.BuildIdOffset)'
 
 steps:
   # Pre-build steps.
+
+- task: ShellScript@2
+  displayName: 'Set up Mono' # the "sn" tool from mono is needed for the build
+  inputs:
+    scriptPath: ./.azure-pipelines/install-mono.sh
 
 - task: UseDotNet@2
   displayName: 'Set up .NET'

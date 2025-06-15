@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>MiniInstaller</AssemblyName>
     <RootNamespace>MiniInstaller</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -65,5 +65,10 @@
     <CreateAppHost AppHostSourcePath="$(AppHost_linux-x64)" AppHostDestinationPath="$(AppHostIntermediatePath_linux-x64)" AppBinaryName="$(AssemblyName)$(TargetExt)" IntermediateAssembly="@(IntermediateAssembly->'%(FullPath)')" />
     <CreateAppHost AppHostSourcePath="$(AppHost_osx-x64)" AppHostDestinationPath="$(AppHostIntermediatePath_osx-x64)" AppBinaryName="$(AssemblyName)$(TargetExt)" IntermediateAssembly="@(IntermediateAssembly->'%(FullPath)')" />
   </Target>
+
+  <!-- Anonymize paths -->
+  <PropertyGroup>
+    <PathMap>$(MSBuildProjectDirectory)=MiniInstaller/</PathMap>
+  </PropertyGroup>
 
 </Project>

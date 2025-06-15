@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <UseAppHost>false</UseAppHost> <!-- EverestSplash will create its own AppHosts -->
@@ -52,5 +52,10 @@
         <CreateAppHost AppHostSourcePath="$(AppHost_linux-x64)" AppHostDestinationPath="$(AppHostIntermediatePath_linux-x64)" AppBinaryName="$(AssemblyName)$(TargetExt)" IntermediateAssembly="@(IntermediateAssembly->'%(FullPath)')" />
         <CreateAppHost AppHostSourcePath="$(AppHost_osx-x64)" AppHostDestinationPath="$(AppHostIntermediatePath_osx-x64)" AppBinaryName="$(AssemblyName)$(TargetExt)" IntermediateAssembly="@(IntermediateAssembly->'%(FullPath)')" />
     </Target>
+
+    <!-- Anonymize paths -->
+    <PropertyGroup>
+        <PathMap>$(MSBuildProjectDirectory)=EverestSplash/</PathMap>
+    </PropertyGroup>
 
 </Project>
