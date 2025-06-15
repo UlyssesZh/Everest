@@ -463,6 +463,7 @@ namespace Celeste.Mod.UI {
             FromChapterSelect = false;
 
             MInput.Disabled = false;
+            Searching = false;
 
             menu.Focused = false;
 
@@ -480,7 +481,6 @@ namespace Celeste.Mod.UI {
             }
 
             menu.Visible = Visible = false;
-            Searching = false;
             menu.RemoveSelf();
             menu = null;
         }
