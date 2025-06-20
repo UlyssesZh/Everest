@@ -598,13 +598,8 @@ namespace Celeste {
             //
             // however we need to pay attention to the new scene, else we'll reload vanilla portraits too soon
             // and make custom portraits stop working. therefore, we ignore these scenes as they don't actually
-            // exit the map:
-            // - MapEditor - debug map
-            // - AssetReloadHelper - f5 bind
-            // - LevelLoader - vanilla f1-f3 binds + everest softlock prevention
-            // - LevelExit (if Mode is Restart or GoldenBerryRestart) - restarts the level, duh
-            if (nextScene is not (Editor.MapEditor or AssetReloadHelper or LevelLoader
-                or patch_LevelExit { Mode: LevelExit.Mode.Restart or LevelExit.Mode.GoldenBerryRestart })) {
+            // exit the map
+            if (nextScene is not (LevelLoader or Pico8.Emulator or OverworldReflectionsFall)) {
                 GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
             }
 
