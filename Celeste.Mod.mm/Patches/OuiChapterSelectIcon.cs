@@ -8,7 +8,6 @@ using Monocle;
 using MonoMod;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -22,8 +21,6 @@ namespace Celeste {
             public string? FrontFrames { get; set; }
             public string? BackFrames { get; set; }
         }
-
-        private const string DetectionPath = "AnimatedMapIcons";
 
         private bool isAnimated;
 
@@ -62,20 +59,25 @@ namespace Celeste {
         public void ctor(int area, MTexture front, MTexture back) {
             orig_ctor(area, front, back);
 
-            // Don't bother if its not in the path, perhaps replace with an alternative check for a .meta.yaml file?
-            if (!front.AtlasPath.Contains(DetectionPath))
-                return;
-
-            isAnimated = true;
-
             // Remove the frame suffex.
             string frontPath = Regex.Replace(front.AtlasPath, "\\d+$", string.Empty);
             string backPath = frontPath + "_back";
 
-            FrontTextures = GFX.Gui.GetAtlasSubtextures(frontPath);
+            bool hasFront = ((patch_Atlas) GFX.Gui).HasAtlasSubtextures(frontPath);
+            bool hasBack = ((patch_Atlas) GFX.Gui).HasAtlasSubtextures(backPath);
+
+            if (hasFront || hasBack)
+                isAnimated = true;
+            else
+                return;
+
+            if (hasFront)
+                FrontTextures = GFX.Gui.GetAtlasSubtextures(frontPath);
+            else
+                FrontTextures = new List<MTexture>() { front };
 
             // Only grab the back textures if applicable. otherwise default to the front textures.
-            if (((patch_Atlas)GFX.Gui).HasAtlasSubtextures(backPath))
+            if (hasBack)
                 BackTextures = GFX.Gui.GetAtlasSubtextures(backPath);
             else if (GFX.Gui.Has(backPath))
                 BackTextures = new List<MTexture>() { GFX.Gui[backPath] };
@@ -91,14 +93,8 @@ namespace Celeste {
             FrontFPS = 12f;
             BackFPS = 12f;
 
-            // Read in data from a .meta.yaml file with the same name as the map icon (excluding the frame suffex).
-            if (!Everest.Content.Map.TryGetValue("Graphics/Atlases/Gui/" + frontPath + ".meta", out ModAsset value) || value.Type != typeof(AssetTypeYaml))
+            if (!(Everest.Content.Get<AssetTypeYaml>("Graphics/Atlases/Gui/" + frontPath + ".meta")?.TryDeserialize(out AnimatedMapIconMeta meta) ?? false))
                 return;
-
-            AnimatedMapIconMeta meta;
-
-            using (TextReader input = new StreamReader(value.Stream))
-                meta = YamlHelper.Deserializer.Deserialize<AnimatedMapIconMeta>(input);
 
             // Back sprite should always default to the front sprite.
             FrontFPS = meta.FrontFPS ?? FrontFPS;
