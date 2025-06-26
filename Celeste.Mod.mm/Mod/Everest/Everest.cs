@@ -321,13 +321,6 @@ namespace Celeste.Mod {
             Logger.Info("core", $"SystemMemoryMB: {SystemMemoryMB:F3} MB");
             Logger.Info("core", $"RuntimeVersion: {Environment.Version}");
 
-            if (Type.GetType("Mono.Runtime") != null) {
-                // Mono hates HTTPS.
-                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => {
-                    return true;
-                };
-            }
-
             // enable TLS 1.2 to fix connecting to everestapi.github.io
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 
