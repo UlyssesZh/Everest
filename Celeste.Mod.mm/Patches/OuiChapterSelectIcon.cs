@@ -114,12 +114,13 @@ namespace Celeste {
         public override void Update() {
             orig_Update();
 
-            // Just return if hidden or if its not animated.
+            // Just return if hidden or if its not animated;
+            // Vanilla also checks for SaveData.Instance presumably as a safety precaution. (Assuming it can actually occur.)
             if (hidden || SaveData.Instance == null || !isAnimated)
                 return;
 
             FrontFrameTimer -= Engine.DeltaTime;
-            if (FrontFrameTimer < 0f) {
+            while (FrontFrameTimer < 0f) {
                 FrontFrameTimer += 1f / FrontFPS;
                 FrontFrame++;
                 FrontFrame %= FrontOrder.Length;
@@ -127,7 +128,7 @@ namespace Celeste {
             }
 
             BackFrameTimer -= Engine.DeltaTime;
-            if (BackFrameTimer < 0f) {
+            while (BackFrameTimer < 0f) {
                 BackFrameTimer += 1f / BackFPS;
                 BackFrame++;
                 BackFrame %= BackOrder.Length;
