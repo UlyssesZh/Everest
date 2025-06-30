@@ -3,6 +3,8 @@ using MonoMod;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Monocle {
     class patch_Scene : Scene {
@@ -41,5 +43,10 @@ namespace Monocle {
         
         internal void ClearOnEndOfFrame() => OnEndOfFrame = null;
 
+        [MonoModReplace]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public new virtual void AfterUpdate() {
+            Interlocked.Exchange(ref OnEndOfFrame, null)?.Invoke();
+        }
     }
 }
