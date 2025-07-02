@@ -122,9 +122,6 @@ namespace Celeste {
                     Everest.RestartVanilla = true;
                     new FadeWipe(Scene, false, () => {
                         Engine.Scene = new Scene();
-                        if (Everest.Flags.IsXNA && Engine.Graphics.IsFullScreen) {
-                            Engine.SetWindowed(320 * Settings.Instance.WindowScale, 180 * Settings.Instance.WindowScale);
-                        }
                         Engine.Instance.Exit();
                     });
                 }

@@ -361,7 +361,7 @@ namespace Monocle {
             if (tex == null || tex.IsDisposed)
                 return;
 
-            if (!(CoreModule.Settings.ThreadedGL ?? Everest.Flags.PreferThreadedGL) && !MainThreadHelper.IsMainThread) {
+            if (!(CoreModule.Settings.ThreadedGL ?? false) && !MainThreadHelper.IsMainThread) {
                 MainThreadHelper.Schedule(() => tex.Dispose());
             } else {
                 tex.Dispose();
@@ -369,7 +369,7 @@ namespace Monocle {
         }
 
         internal bool LoadImmediately =>
-            !_Texture_FTLLoading && ((CoreModule.Settings.ThreadedGL ?? Everest.Flags.PreferThreadedGL) || MainThreadHelper.IsMainThread);
+            !_Texture_FTLLoading && ((CoreModule.Settings.ThreadedGL ?? false) || MainThreadHelper.IsMainThread);
         internal bool Load(bool wait, Func<Texture2D> load) {
             if (LoadImmediately) {
                 Texture_Unsafe?.Dispose();
@@ -511,39 +511,21 @@ namespace Monocle {
                             if (Metadata.TryGetMeta(out TextureMeta meta))
                                 premul = meta.Premultiplied;
 
-                            if (ContentExtensions.TextureSetDataSupportsPtr) {
-                                int w, h;
-                                IntPtr dataPtr;
-                                if (premul)
-                                    ContentExtensions.LoadTextureRaw(Celeste.Celeste.Instance.GraphicsDevice, stream, out w, out h, out dataPtr);
-                                else
-                                    ContentExtensions.LoadTextureLazyPremultiply(Celeste.Celeste.Instance.GraphicsDevice, stream, out w, out h, out dataPtr);
-                                stream.Dispose();
-                                Width = w;
-                                Height = h;
-                                Load(false, () => {
-                                    Texture2D tex = new Texture2D(Celeste.Celeste.Instance.GraphicsDevice, w, h, false, SurfaceFormat.Color);
-                                    tex.SetData(dataPtr);
-                                    ContentExtensions.UnloadTextureRaw(dataPtr);
-                                    return tex;
-                                });
-                            } else {
-                                int w, h;
-                                byte[] data;
-                                if (premul)
-                                    ContentExtensions.LoadTextureRaw(Celeste.Celeste.Instance.GraphicsDevice, stream, out w, out h, out data);
-                                else
-                                    ContentExtensions.LoadTextureLazyPremultiply(Celeste.Celeste.Instance.GraphicsDevice, stream, out w, out h, out data);
-                                stream.Dispose();
-                                Width = w;
-                                Height = h;
-                                Load(false, () => {
-                                    Texture2D tex = new Texture2D(Celeste.Celeste.Instance.GraphicsDevice, w, h, false, SurfaceFormat.Color);
-                                    tex.SetData(data);
-                                    data = null;
-                                    return tex;
-                                });
-                            }
+                            int w, h;
+                            IntPtr dataPtr; // assume Texture.SetData supports Ptr since we are using FNA
+                            if (premul)
+                                ContentExtensions.LoadTextureRaw(Celeste.Celeste.Instance.GraphicsDevice, stream, out w, out h, out dataPtr);
+                            else
+                                ContentExtensions.LoadTextureLazyPremultiply(Celeste.Celeste.Instance.GraphicsDevice, stream, out w, out h, out dataPtr);
+                            stream.Dispose();
+                            Width = w;
+                            Height = h;
+                            Load(false, () => {
+                                Texture2D tex = new Texture2D(Celeste.Celeste.Instance.GraphicsDevice, w, h, false, SurfaceFormat.Color);
+                                tex.SetData(dataPtr);
+                                ContentExtensions.UnloadTextureRaw(dataPtr);
+                                return tex;
+                            });
                         }
 
                     } else if (Fallback != null) {
@@ -564,17 +546,12 @@ namespace Monocle {
                                 if (premul) {
                                     Texture2D tex = Texture2D.FromStream(Celeste.Celeste.Instance.GraphicsDevice, stream);
                                     return tex;
-                                } else if (ContentExtensions.TextureSetDataSupportsPtr) {
+                                } else {
                                     ContentExtensions.LoadTextureLazyPremultiply(Celeste.Celeste.Instance.GraphicsDevice, stream, out int w, out int h, out IntPtr dataPtr);
                                     Texture2D tex = new Texture2D(Celeste.Celeste.Instance.GraphicsDevice, w, h, false, SurfaceFormat.Color);
+                                     // assume Texture.SetData supports Ptr since we are using FNA
                                     tex.SetData(dataPtr);
                                     ContentExtensions.UnloadTextureRaw(dataPtr);
-                                    return tex;
-                                } else {
-                                    ContentExtensions.LoadTextureLazyPremultiply(Celeste.Celeste.Instance.GraphicsDevice, stream, out int w, out int h, out byte[] data);
-                                    Texture2D tex = new Texture2D(Celeste.Celeste.Instance.GraphicsDevice, w, h, false, SurfaceFormat.Color);
-                                    tex.SetData(data);
-                                    data = null;
                                     return tex;
                                 }
 
@@ -602,7 +579,7 @@ namespace Monocle {
 
             } else {
                 int w, h;
-                bool bufferGC = !ContentExtensions.TextureSetDataSupportsPtr;
+                bool bufferGC = false;
                 byte[] buffer = null;
                 IntPtr bufferPtr = IntPtr.Zero;
                 bool bufferStolen = false;
