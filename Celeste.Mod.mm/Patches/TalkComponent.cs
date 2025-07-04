@@ -65,7 +65,7 @@ namespace Celeste {
                 } else {
                     // Entity has no Collider, fallback to Position
                     if (alpha < 1f && Handler.Entity != null && !Scene.CollideCheck<FakeWall>(Handler.Entity.Position)) {
-                        alpha = 0f;
+                        alpha = Calc.Approach(alpha, 1f, 2f * Engine.DeltaTime);
                     }
                 }
                 // force alpha if the player can interact
