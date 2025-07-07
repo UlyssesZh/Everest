@@ -361,7 +361,7 @@ namespace Monocle {
             if (tex == null || tex.IsDisposed)
                 return;
 
-            if (!(CoreModule.Settings.ThreadedGL ?? false) && !MainThreadHelper.IsMainThread) {
+            if ((!CoreModule.Settings.ThreadedGL ?? true) && !MainThreadHelper.IsMainThread) {
                 MainThreadHelper.Schedule(() => tex.Dispose());
             } else {
                 tex.Dispose();

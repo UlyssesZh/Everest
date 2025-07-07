@@ -451,7 +451,7 @@ namespace Celeste {
                 }
             }
 
-            if (!(CoreModule.Settings.ThreadedGL ?? false) && !MainThreadHelper.IsMainThread && queuedLoadLock == null) {
+            if ((!CoreModule.Settings.ThreadedGL ?? true) && !MainThreadHelper.IsMainThread && queuedLoadLock == null) {
                 // Let's queue a reload onto the main thread and call it a day.
                 lock (queuedLoadLock = new object()) {
                     _Billboard_QueuedLoadLock = queuedLoadLock;
