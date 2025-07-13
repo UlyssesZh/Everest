@@ -44,10 +44,9 @@ namespace Celeste {
                 Thread.CurrentThread.Name = "Main Thread";
             }
 
-            // we cannot use Everest.Flags.IsFNA at this point because flags aren't initialized yet.
-            bool isFNA = typeof(Game).Assembly.FullName.Contains("FNA");
-            string correctFile = $"BuildIs{(isFNA ? "FNA" : "XNA")}.txt";
-            string wrongFile = $"BuildIs{(isFNA ? "XNA" : "FNA")}.txt";
+            // we assume FNA since Everest Core.
+            string correctFile = "BuildIsFNA.txt";
+            string wrongFile = "BuildIsXNA.txt";
             if (File.Exists(wrongFile))
                 File.Delete(wrongFile);
             if (!File.Exists(correctFile))
@@ -347,7 +346,7 @@ https://discord.gg/6qjaePQ");
              * -ade
              */
 
-            if (CoreModule.Settings.FastTextureLoading ?? (Environment.ProcessorCount >= 4 && !(CoreModule.Settings.ThreadedGL ?? Everest.Flags.PreferThreadedGL))) {
+            if (CoreModule.Settings.FastTextureLoading ?? (Environment.ProcessorCount >= 4 && (!CoreModule.Settings.ThreadedGL ?? true))) {
                 long limit = (long) (CoreModule.Settings.FastTextureLoadingMaxMB * 1024f * 1024f);
 
                 if (limit <= 0) {

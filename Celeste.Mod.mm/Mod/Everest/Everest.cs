@@ -61,8 +61,8 @@ namespace Celeste.Mod {
         /// <summary>
         /// The currently present Celeste version combined with the currently installed Everest build.
         /// </summary>
-        // we cannot use Everest.Flags.IsFNA at this point because flags aren't initialized yet when it's used for the first time in log
-        public static string VersionCelesteString => $"{Celeste.Instance.Version}-{(typeof(Game).Assembly.FullName.Contains("FNA") ? "fna" : "xna")} [Everest: {BuildString}]";
+        // assume FNA since Everest Core
+        public static string VersionCelesteString => $"{Celeste.Instance.Version}-fna [Everest: {BuildString}]";
 
         /// <summary>
         /// UTF8 text encoding without a byte order mark, to be preferred over Encoding.UTF8
@@ -321,13 +321,6 @@ namespace Celeste.Mod {
             Logger.Info("core", $"SystemMemoryMB: {SystemMemoryMB:F3} MB");
             Logger.Info("core", $"RuntimeVersion: {Environment.Version}");
 
-            if (Type.GetType("Mono.Runtime") != null) {
-                // Mono hates HTTPS.
-                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => {
-                    return true;
-                };
-            }
-
             // enable TLS 1.2 to fix connecting to everestapi.github.io
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 
@@ -454,7 +447,7 @@ namespace Celeste.Mod {
             // Note: Everest fulfills some mod dependencies by itself.
             NullModule vanilla = new NullModule(new EverestModuleMetadata {
                 Name = "Celeste",
-                VersionString = $"{Celeste.Instance.Version.ToString()}-{(Flags.IsFNA ? "fna" : "xna")}"
+                VersionString = $"{Celeste.Instance.Version.ToString()}-fna"
             });
             vanilla.Register();
             vanilla.Metadata.RegisterMod();
@@ -878,12 +871,7 @@ namespace Celeste.Mod {
             }
 
             AppDomain.CurrentDomain.SetData("EverestRestart", true);
-            scene.RunAfterRender = () => {
-                if (Flags.IsXNA && Engine.Graphics.IsFullScreen) {
-                    Engine.SetWindowed(320 * (Settings.Instance?.WindowScale ?? 1), 180 * (Settings.Instance?.WindowScale ?? 1));
-                }
-                Engine.Instance.Exit();
-            };
+            scene.RunAfterRender = Engine.Instance.Exit;
             yield break;
         }
 

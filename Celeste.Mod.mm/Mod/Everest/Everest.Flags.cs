@@ -12,22 +12,24 @@ namespace Celeste.Mod {
             /// <summary>
             /// Is the game running on XNA - always false on .NET Core Everest.
             /// </summary>
+            [Obsolete("`IsXNA` is always false on Everest Core")]
             public static bool IsXNA => false;
 
             /// <summary>
             /// Is the game running on FNA - always true on .NET Core Everest.
             /// </summary>
+            [Obsolete("`IsFNA` is always true on Everest Core")]
             public static bool IsFNA => true;
 
             /// <summary>
             /// Is the vanilla install running on XNA?
             /// </summary>
-            public static bool VanillaIsXNA { get; private set;}
+            public static bool VanillaIsXNA { get; private set; }
 
             /// <summary>
             /// Is the vanilla install running on FNA?
             /// </summary>
-            public static bool VanillaIsFNA { get; private set;}
+            public static bool VanillaIsFNA { get; private set; }
 
             /// <summary>
             /// Is Everest running without a window?
@@ -37,6 +39,7 @@ namespace Celeste.Mod {
             /// <summary>
             /// Is the game running using Mono - always false on .NET Core Everest.
             /// </summary>
+            [Obsolete("`IsMono` is always false on Everest Core")]
             public static bool IsMono => false;
 
             /// <summary>
@@ -51,7 +54,8 @@ namespace Celeste.Mod {
             /// <summary>
             /// Does the environment (renderer, framework ,...) prefer threaded GL?
             /// </summary>
-            public static bool PreferThreadedGL { get; private set; }
+            [Obsolete("`PreferThreadedGL` is always false on Everest Core")]
+            public static bool PreferThreadedGL => false;
 
             /// <summary>
             /// Does the environment (platform, ...) support loading runtime mods?
@@ -77,9 +81,6 @@ namespace Celeste.Mod {
 
                 AvoidRenderTargets = Environment.GetEnvironmentVariable("EVEREST_NO_RT") == "1";
                 PreferLazyLoading = false;
-
-                // The way how FNA3D's D3D11 implementation handles threaded GL is hated by a few drivers.
-                PreferThreadedGL = IsXNA;
 
                 SupportRuntimeMods = true;
                 SupportUpdatingEverest = true;

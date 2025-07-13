@@ -160,7 +160,7 @@ namespace Celeste {
                 }
             }
 
-            if (!(CoreModule.Settings.ThreadedGL ?? Everest.Flags.PreferThreadedGL) && !MainThreadHelper.IsMainThread && queuedLoadLock == null) {
+            if ((!CoreModule.Settings.ThreadedGL ?? true) && !MainThreadHelper.IsMainThread && queuedLoadLock == null) {
                 // Let's queue a reload onto the main thread and call it a day.
                 lock (queuedLoadLock = new object()) {
                     _Vertices_QueuedLoadLock = queuedLoadLock;
