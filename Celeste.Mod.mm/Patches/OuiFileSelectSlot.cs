@@ -44,6 +44,8 @@ namespace Celeste {
 
         private OuiFileSelectSlotLevelSetPicker newGameLevelSetPicker;
 
+        public bool MissingVanillaData;
+
         // computed maximums for stamp rendering
         private int maxStrawberryCount;
         private int maxGoldenStrawberryCount;
@@ -204,8 +206,6 @@ namespace Celeste {
 
         public extern void orig_OnNewGameSelected();
         public void OnNewGameSelected() {
-            patch_SaveData.TryDeleteModSaveData(FileSlot);
-
             orig_OnNewGameSelected();
 
             string newGameLevelSet = newGameLevelSetPicker?.NewGameLevelSet;
@@ -291,6 +291,7 @@ namespace Celeste {
             public float Scale = 1f;
         }
 
+        [PatchFileSelectSlotRenderMissingVanillaDataDialog]
         [PatchFileSelectSlotRender] // manually manipulate the method via MonoModRules
         public extern void orig_Render();
         public override void Render() {
@@ -354,6 +355,12 @@ namespace MonoMod {
     [MonoModCustomMethodAttribute(nameof(MonoModRules.PatchOuiFileSelectSlotOnContinueSelected))]
     class PatchOuiFileSelectSlotOnContinueSelectedAttribute : Attribute { }
 
+    /// <summary>
+    /// Patches the method to differentiate between Corrupted and MissingVanillaData.
+    /// </summary>
+    [MonoModCustomMethodAttribute(nameof(MonoModRules.PatchFileSelectSlotRenderMissingVanillaDataDialog))]
+    class PatchFileSelectSlotRenderMissingVanillaDataDialog : Attribute { }
+
     static partial class MonoModRules {
 
         public static void PatchOuiFileSelectSlotUpdate(ILContext context, CustomAttribute attrib) {
@@ -368,6 +375,48 @@ namespace MonoMod {
             cursor.EmitCall(m_CoreModule_get_Settings);
             cursor.EmitCallvirt(m_get_AllowScreenFlash);
             cursor.Next.OpCode = OpCodes.Brfalse;
+        }
+
+        public static void PatchFileSelectSlotRenderMissingVanillaDataDialog(ILContext context, CustomAttribute attrib) {
+            TypeDefinition declaringType = context.Method.DeclaringType;
+            FieldDefinition f_MissingVanillaData = declaringType.FindField("MissingVanillaData");
+
+            ILCursor cursor = new ILCursor(context);
+
+            // C# change:
+            // [...]
+            // else if (Corrupted)
+            // {
+            // -    ActiveFont.Draw(Dialog.Clean("file_corrupted"), slide2, new Vector2(0.5f, 0.5f), Vector2.One, Color.Black * 0.8f);
+            // +    ActiveFont.Draw(Dialog.Clean((!MissingVanillaData) ? "file_corrupted" : "MISSING_VANILLA_DATA"), vector3, new Vector2(0.5f, 0.5f), Vector2.One, Color.Black * 0.8f);
+            // }
+            // [...]
+
+            // IL change:
+            // [...]
+            //          ldfld System.Boolean Celeste.OuiFileSelectSlot::Corrupted
+            //          brfalse.s (...)
+            // +        ldarg.0
+            // +        ldfld bool Celeste.OuiFileSelectSlot::MissingVanillaData
+            // +        brfalse.s ldstr
+            // +        ldstr "MISSING_VANILLA_DATA"
+            // +        br.s ldnull
+            // ldstr  : ldstr "file_corrupted"
+            // ldnull : ldnull
+            //          call string Celeste.Dialog::Clean(string, class Celeste.Language)
+            // [...]
+
+            cursor.GotoNext(MoveType.Before, instr => instr.MatchLdstr("file_corrupted"));
+            ILLabel ldstr = cursor.MarkLabel();
+            cursor.GotoNext();
+            ILLabel ldnull = cursor.MarkLabel();
+
+            cursor.GotoLabel(ldstr, MoveType.Before);
+            cursor.EmitLdarg0();
+            cursor.EmitLdfld(f_MissingVanillaData);
+            cursor.EmitBrfalse(ldstr);
+            cursor.EmitLdstr("MISSING_VANILLA_DATA");
+            cursor.EmitBr(ldnull);
         }
 
         public static void PatchFileSelectSlotRender(ILContext context, CustomAttribute attrib) {

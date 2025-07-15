@@ -6,6 +6,7 @@ using Monocle;
 using MonoMod;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml;
@@ -297,8 +298,19 @@ namespace Celeste {
 
         public static extern bool orig_TryDelete(int slot);
         public static new bool TryDelete(int slot) {
-            if (!orig_TryDelete(slot))
-                return false;
+            bool vanillaExists = false;
+            string saveFilePath = patch_UserIO.GetSaveFilePath();
+            if (Directory.Exists(saveFilePath))
+                vanillaExists = File.Exists(Path.Combine(saveFilePath, $"{slot}.celeste"));
+
+            if (vanillaExists) {
+                if (!orig_TryDelete(slot)) {
+                    return false;
+                }
+            }
+            else
+                Logger.Warn("SaveData", $"Deleting save data for slot {slot} which has no vanilla data");
+
             return TryDeleteModSaveData(slot);
         }
 
