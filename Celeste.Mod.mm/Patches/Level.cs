@@ -367,8 +367,8 @@ namespace Celeste {
 
         // Called from LoadLevel, patched via MonoModRules.PatchLevelLoader
         private static Player LoadNewPlayerForLevel(Vector2 position, PlayerSpriteMode spriteMode, Level lvl) {
-            // Check if there is a player override
-            if (LoadOverrides.TryGetValue(lvl, out LoadOverride ovr) && ovr.NextLoadedPlayer != null) {
+            // Check if there is a player override (that isn't dead!)
+            if (LoadOverrides.TryGetValue(lvl, out LoadOverride ovr) && ovr.NextLoadedPlayer is { Dead: false }) {
                 Player player = ovr.NextLoadedPlayer;
 
                 // Oh wait, you think we can just return the player override now?
