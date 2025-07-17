@@ -18,7 +18,7 @@ case "$1" in
     "StrawberryJam2021")
         TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/0716ac76d4b9ad0b17848ee1cfd049b8385da99d.zip"
         TAS_PATH="StrawberryJamTAS-0716ac76d4b9ad0b17848ee1cfd049b8385da99d/0-SJ All Levels.tas"
-        BUNDLE_DOWNLOAD="https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-7471cb92.zip"
+        BUNDLE_DOWNLOAD="https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-dd66c808.zip"
         ;;
 
     *)
