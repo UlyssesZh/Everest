@@ -14,8 +14,8 @@ jobs:
             path: "CelesteTAS-3bc30480b1465e53a90b40454245d26582a9030a/0 - 100%.tas"
 
           - name: Strawberry Jam All Levels
-            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/0716ac76d4b9ad0b17848ee1cfd049b8385da99d.zip"
-            path: "StrawberryJamTAS-0716ac76d4b9ad0b17848ee1cfd049b8385da99d/0-SJ All Levels.tas"
+            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/f31e88b79a59a71b62091812ec21a891ea868d5e.zip"
+            path: "StrawberryJamTAS-f31e88b79a59a71b62091812ec21a891ea868d5e/0-SJ All Levels.tas"
             bundle: "https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-5f33b50d.zip"
 
     runs-on: ubuntu-latest
