@@ -14,7 +14,7 @@ namespace Celeste.Mod.Helpers {
         private class Cacher : CacheHelper<string, ListInt> {
             public Cacher() : base(name: "UnicodeStringHelper.ToCodePointList", maxSize: 1000) { }
 
-            protected override ListInt compute(string text) {
+            protected override ListInt Compute(string text) {
                 return new ListInt {
                     Elements = text.EnumerateRunes().Select(r => r.Value).ToArray()
                 };

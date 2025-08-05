@@ -181,7 +181,7 @@ namespace Celeste.Mod {
         private class CachedApply : CacheHelper<string, string> {
             public CachedApply() : base(name: "Emoji.Apply", maxSize: 1000) { }
 
-            protected override string compute(string text) {
+            protected override string Compute(string text) {
                 if (text == null)
                     return text;
 

@@ -7,9 +7,14 @@ namespace Celeste.Mod.Helpers {
      * to help with performance or with repeated memory allocations.
      */
     public abstract class CacheHelper<Key, Value> {
+        private readonly struct ValueNode {
+            public LinkedListNode<Key> Node { get; init; }
+            public Value Value { get; init; }
+        }
+
         private readonly string name;
         private readonly int maxSize;
-        private readonly Dictionary<Key, Value> cache = new Dictionary<Key, Value>();
+        private readonly Dictionary<Key, ValueNode> cache = new Dictionary<Key, ValueNode>();
         private readonly LinkedList<Key> cacheOldestToNewest = new LinkedList<Key>();
 
         public CacheHelper(string name, int maxSize) {
@@ -19,28 +24,27 @@ namespace Celeste.Mod.Helpers {
 
         public Value GetCached(Key key) {
             lock (cache) {
-                if (cache.TryGetValue(key, out Value value)) {
-                    LinkedListNode<Key> node = cacheOldestToNewest.Find(key);
-                    cacheOldestToNewest.Remove(node);
-                    cacheOldestToNewest.AddLast(node);
-                    return value;
+                if (cache.TryGetValue(key, out ValueNode valueNode)) {
+                    cacheOldestToNewest.Remove(valueNode.Node);
+                    cacheOldestToNewest.AddLast(valueNode.Node);
+                    return valueNode.Value;
                 }
 
-                value = compute(key);
+                Value value = Compute(key);
                 while (cache.Count >= maxSize) {
                     Key keyToEvict = cacheOldestToNewest.First.Value;
                     cache.Remove(keyToEvict);
                     cacheOldestToNewest.RemoveFirst();
                 }
 
-                cache.Add(key, value);
-                cacheOldestToNewest.AddLast(key);
+                LinkedListNode<Key> node = cacheOldestToNewest.AddLast(key);
+                cache.Add(key, new ValueNode { Node = node, Value = value });
                 Logger.Verbose("CacheHelper", $"[{name}] Cached value for \"{key}\" => \"{value}\", cache size: {cache.Count}");
                 return value;
             }
         }
 
-        protected abstract Value compute(Key key);
+        protected abstract Value Compute(Key key);
 
         public void Clear() {
             lock (cache) {
