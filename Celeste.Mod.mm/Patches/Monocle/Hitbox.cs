@@ -16,6 +16,27 @@ namespace Monocle {
             // no-op, ignored by MonoMod
         }
         
+        // Seal and add AggressiveInlining onto the properties for better performance in various collision checks.
+        // No mods override these properties (nor should there be a reason to do so) as of now, so this is safe to do.
+        
+        [MonoModIgnore, ForceSealed, ForceAggressiveInlining]
+        public override float Width { get; set; }
+        
+        [MonoModIgnore, ForceSealed, ForceAggressiveInlining]
+        public override float Height { get; set; }
+
+        [MonoModIgnore, ForceSealed, ForceAggressiveInlining]
+        public override float Left { get; set; }
+
+        [MonoModIgnore, ForceSealed, ForceAggressiveInlining]
+        public override float Top { get; set; }
+
+        [MonoModIgnore, ForceSealed, ForceAggressiveInlining]
+        public override float Right { get; set; }
+
+        [MonoModIgnore, ForceSealed, ForceAggressiveInlining]
+        public override float Bottom { get; set; }
+        
         // Optimise most frequent collision methods to avoid virtual calls:
         
         [MonoModReplace]
