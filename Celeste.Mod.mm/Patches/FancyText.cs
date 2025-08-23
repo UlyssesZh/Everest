@@ -3,13 +3,11 @@
 using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using Monocle;
-using MonoMod;
 
 namespace Celeste {
     // The FancyText ctor is private.
     class patch_FancyText {
 
-        [PatchTextIteration]
         private extern void orig_AddWord(string word);
         private void AddWord(string word) {
             word = Emoji.Apply(word);
