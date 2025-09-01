@@ -50,19 +50,24 @@ namespace Celeste.Mod.Helpers {
             }
         }
 
+        [Flags]
         private enum WhatToSave {
-            File = 1,
-            Settings = 2,
-            All = 3
+            File = 1 << 0,
+            Settings = 1 << 1,
+            All = File | Settings
         }
 
         [Command("save", "saves the game")]
         public static void Save(string whatToSave = "file") {
-            if (Enum.TryParse(whatToSave, ignoreCase: true, out WhatToSave what))
-                UserIO.SaveHandler(
-                    file: (what & WhatToSave.File) != 0,
-                    settings: (what & WhatToSave.Settings) != 0
-                );
+            if (!string.IsNullOrWhiteSpace(whatToSave) && Enum.TryParse(whatToSave, ignoreCase: true, out WhatToSave what)) {
+                bool isFile = (what & WhatToSave.File) != 0;
+                bool isSettings = (what & WhatToSave.Settings) != 0;
+
+                // If the user has not entered a file yet, trying to save the file will crash; so avoid that
+                if (SaveData.Instance is null) isFile = false;
+
+                UserIO.SaveHandler(isFile, isSettings);
+            }
             else
                 Engine.Commands.Log($"Invalid option! Use File, Settings, or All");
         }
