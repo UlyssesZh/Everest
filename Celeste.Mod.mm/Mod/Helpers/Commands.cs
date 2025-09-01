@@ -58,7 +58,7 @@ namespace Celeste.Mod.Helpers {
         }
 
         [Command("save", "saves the game")]
-        public static void Save(string whatToSave = "file") {
+        public static void Save(string whatToSave = "all") {
             if (!string.IsNullOrWhiteSpace(whatToSave) && Enum.TryParse(whatToSave, ignoreCase: true, out WhatToSave what)) {
                 bool isFile = (what & WhatToSave.File) != 0;
                 bool isSettings = (what & WhatToSave.Settings) != 0;
@@ -66,7 +66,8 @@ namespace Celeste.Mod.Helpers {
                 // If the user has not entered a file yet, trying to save the file will crash; so avoid that
                 if (SaveData.Instance is null) isFile = false;
 
-                UserIO.SaveHandler(isFile, isSettings);
+                if (isFile || isSettings)
+                    UserIO.SaveHandler(isFile, isSettings);
             }
             else
                 Engine.Commands.Log($"Invalid option! Use File, Settings, or All");
