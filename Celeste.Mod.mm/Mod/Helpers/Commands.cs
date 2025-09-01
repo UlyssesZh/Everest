@@ -49,6 +49,23 @@ namespace Celeste.Mod.Helpers {
                 OuiModOptions.Instance.Overworld.Goto<OuiSoundTest>();
             }
         }
+
+        private enum WhatToSave {
+            File = 1,
+            Settings = 2,
+            All = 3
+        }
+
+        [Command("save", "saves the game")]
+        public static void Save(string whatToSave = "file") {
+            if (Enum.TryParse(whatToSave, ignoreCase: true, out WhatToSave what))
+                UserIO.SaveHandler(
+                    file: (what & WhatToSave.File) != 0,
+                    settings: (what & WhatToSave.Settings) != 0
+                );
+            else
+                Engine.Commands.Log($"Invalid option! Use File, Settings, or All");
+        }
     }
 
 
