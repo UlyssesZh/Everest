@@ -65,15 +65,15 @@ namespace MonoMod {
             cursor.MarkLabel(noDiv);
 
             // insert culling code after the curve is fully set up.
-            cursor.GotoNext(MoveType.After, instr => instr.MatchStfld("Monocle.SimpleCurve", "Control"));
+            cursor.GotoNext(MoveType.After, static instr => instr.MatchStfld("Monocle.SimpleCurve", "Control"));
 
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Call, il.Method.DeclaringType.FindMethod("System.Boolean IsVisible()"));
+            cursor.EmitLdarg0();
+            cursor.EmitCall(il.Method.DeclaringType.FindMethod("System.Boolean IsVisible()"));
 
             // return early if IsVisible returned false
             ILLabel label = cursor.DefineLabel();
-            cursor.Emit(OpCodes.Brtrue, label);
-            cursor.Emit(OpCodes.Ret);
+            cursor.EmitBrtrue(label);
+            cursor.EmitRet();
             cursor.MarkLabel(label);
         }
     }
