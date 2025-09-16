@@ -308,11 +308,6 @@ namespace Celeste.Mod.Core {
 
         [SettingIgnore]
         public int DebugRCPort { get; set; } = 32270;
-
-        public bool PhotosensitiveMode {
-            get => Settings.Instance.DisableFlashes;
-            set => Settings.Instance.DisableFlashes = value;
-        }
         
         [SettingIgnore]
         [EditorBrowsable(EditorBrowsableState.Never)]
