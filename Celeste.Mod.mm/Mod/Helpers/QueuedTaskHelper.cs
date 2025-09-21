@@ -181,7 +181,7 @@ namespace Celeste.Mod {
         /// </throws>
         public static QueuedTask Do(object key, TimeSpan delay, Action @delegate, CancellationToken cancellationToken) {
             lock (RunningTasks) {
-                if (RunningTasks.TryGetValue(key, out QueuedTaskBase baseTask)) {
+                if (RunningTasks.TryGetValue(key, out QueuedTaskBase baseTask) && !baseTask.Queued.IsCompleted) {
                     if (baseTask is not QueuedTask existingTask)
                         throw new InvalidOperationException("A queued task with an incompatible type is already running.");
 
@@ -281,7 +281,7 @@ namespace Celeste.Mod {
         /// </throws>
         public static QueuedTask<T> Get<T>(object key, Func<T> @delegate, TimeSpan delay, CancellationToken cancellationToken) {
             lock (RunningTasks) {
-                if (RunningTasks.TryGetValue(key, out QueuedTaskBase baseTask)) {
+                if (RunningTasks.TryGetValue(key, out QueuedTaskBase baseTask) && !baseTask.Queued.IsCompleted) {
                     if (baseTask is not QueuedTask<T> existingTask)
                         throw new InvalidOperationException("A queued task with an incompatible type is already running.");
 
@@ -338,6 +338,21 @@ namespace Celeste.Mod {
             DelayTask = Task.Delay(delay, CancellationToken);
         }
 
+        protected async Task WaitForDelay() {
+            // force the task to run asynchronously by yielding - we don't want to block the main thread
+            await Task.Yield();
+
+            // we need to wait on loop because DelayTask could have been changed by OverlayDelay
+            do {
+                await DelayTask;
+            } while (!DelayTask.IsCompleted);
+        }
+
+        protected void LogError(Exception exception) {
+            Logger.Error(nameof(QueuedTask), $"A queued task with key hashcode {Key.GetHashCode()} failed.");
+            Logger.LogDetailed(exception);
+        }
+
         protected void CompleteTask() {
             QueuedTaskHelperV2.RunningTasks.Remove(Key);
         }
@@ -356,16 +371,15 @@ namespace Celeste.Mod {
         }
 
         private async Task Run(Action @delegate) {
-            // force the task to run asynchronously by yielding - we don't want to block the main thread
-            await Task.Yield();
-
-            // we need to wait on loop because DelayTask could have been changed by OverlayDelay
-            do {
-                await DelayTask;
-            } while (!DelayTask.IsCompleted);
-
-            @delegate();
-            CompleteTask();
+            try {
+                await WaitForDelay();
+                @delegate();
+            } catch (Exception e) when (e is not OperationCanceledException) {
+                LogError(e);
+                throw;
+            } finally {
+                CompleteTask();
+            }
         }
     }
 
@@ -385,17 +399,15 @@ namespace Celeste.Mod {
         }
 
         private async Task<T> Run(Func<T> @delegate) {
-            // force the task to run asynchronously by yielding - we don't want to block the main thread
-            await Task.Yield();
-
-            // we need to wait on loop because DelayTask could have been changed by OverlayDelay
-            do {
-                await DelayTask;
-            } while (!DelayTask.IsCompleted);
-
-            T value = @delegate();
-            CompleteTask();
-            return value;
+            try {
+                await WaitForDelay();
+                return @delegate();
+            } catch (Exception e) when (e is not OperationCanceledException) {
+                LogError(e);
+                throw;
+            } finally {
+                CompleteTask();
+            }
         }
     }
 }
