@@ -235,7 +235,7 @@ namespace Celeste.Mod {
                     return;
 
                 Logger.Info("loader", $"Possible new mod container: {e.FullPath}");
-                QueuedTaskHelper.Do("LoadAutoUpdated:" + e.FullPath, () => AssetReloadHelper.Do($"{Dialog.Clean("ASSETRELOADHELPER_LOADINGNEWMOD")} {Path.GetFileName(e.FullPath)}", () => MainThreadHelper.Schedule(() => {
+                QueuedTaskHelperV2.Do("LoadAutoUpdated:" + e.FullPath, () => AssetReloadHelper.Do($"{Dialog.Clean("ASSETRELOADHELPER_LOADINGNEWMOD")} {Path.GetFileName(e.FullPath)}", () => MainThreadHelper.Schedule(() => {
                     if (Directory.Exists(e.FullPath))
                         LoadDir(e.FullPath);
                     else if (e.FullPath.EndsWith(".zip"))
@@ -843,7 +843,7 @@ namespace Celeste.Mod {
                 if (!Flags.SupportRuntimeMods || meta.AssemblyContext == null)
                     return;
 
-                QueuedTaskHelper.Do($"ReloadModAssembly: {meta.Name}", () => {
+                QueuedTaskHelperV2.Do($"ReloadModAssembly: {meta.Name}", () => {
                     Logger.Info("loader", $"Reloading mod assemblies: {meta.Name}");
 
                     AssetReloadHelper.Do($"{Dialog.Clean("ASSETRELOADHELPER_RELOADINGMODASSEMBLY")} {meta.Name}", () => {

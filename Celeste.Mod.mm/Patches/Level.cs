@@ -567,7 +567,7 @@ namespace Celeste {
                 return;
             }
 
-            QueuedTaskHelper.Do(_GCCollectLock, () => {
+            QueuedTaskHelperV2.Do(_GCCollectLock, () => {
                 GC.Collect(1, GCCollectionMode.Forced, false);
             });
         }

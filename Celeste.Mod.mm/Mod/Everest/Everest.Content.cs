@@ -284,12 +284,12 @@ namespace Celeste.Mod {
                 return;
 
             Logger.Verbose("content", $"File updated: {e.FullPath} - {e.ChangeType}");
-            QueuedTaskHelper.Do(e.FullPath, () => Update(e.FullPath, e.FullPath));
+            QueuedTaskHelperV2.Do(e.FullPath, () => Update(e.FullPath, e.FullPath));
         }
 
         private void FileRenamed(object source, RenamedEventArgs e) {
             Logger.Verbose("content", $"File renamed: {e.OldFullPath} - {e.FullPath}");
-            QueuedTaskHelper.Do(Tuple.Create(e.OldFullPath, e.FullPath), () => Update(e.OldFullPath, e.FullPath));
+            QueuedTaskHelperV2.Do(Tuple.Create(e.OldFullPath, e.FullPath), () => Update(e.OldFullPath, e.FullPath));
         }
 
         private void WatcherError(object source, ErrorEventArgs e) {
