@@ -335,6 +335,8 @@ namespace Celeste.Mod {
         ///   which starts <c>7.5</c> seconds after the first one, the total delay becomes <c>12.5</c> seconds.
         /// </remarks>
         internal void OverlayDelay(TimeSpan delay) {
+            if (Queued?.IsCompleted ?? false)
+                throw new InvalidOperationException("Cannot overlay a delay on a completed task.");
             DelayTask = Task.Delay(delay, CancellationToken);
         }
 
