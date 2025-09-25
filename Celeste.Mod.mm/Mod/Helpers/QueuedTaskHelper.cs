@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 // the class has been part of the public API for years, so we can't just change the namespace
 // ReSharper disable CheckNamespace
 namespace Celeste.Mod {
-    [Obsolete("Use QueuedTaskHelperV2 instead.")]
+    [Obsolete($"Use {nameof(QueuedTaskHelperV2)} instead.")]
     public static class QueuedTaskHelper {
 
         // Make sure to lock Timers and update both of those at the same time before unlocking!
@@ -16,7 +16,7 @@ namespace Celeste.Mod {
 
         public static readonly double DefaultDelay = 0.5D;
 
-        [Obsolete($"Queued tasks now support {nameof(CancellationToken)}s. Pass the token when creating the task and cancel it when necessary.")]
+        [Obsolete($"{nameof(QueuedTaskHelperV2)} supports {nameof(CancellationToken)}s. Pass the token when creating the task and cancel it when necessary.")]
         public static void Cancel(object key) {
             lock (Timers) {
                 if (Timers.Remove(key, out Stopwatch timer)) {
@@ -27,11 +27,11 @@ namespace Celeste.Mod {
             }
         }
 
-        [Obsolete("Use QueuedTaskHelperV2.Do instead.")]
+        [Obsolete($"Use {nameof(QueuedTaskHelperV2)}.{nameof(QueuedTaskHelperV2.Do)} instead.")]
         public static Task Do(object key, Action a)
             => Do(key, DefaultDelay, a);
 
-        [Obsolete("Use QueuedTaskHelperV2.Do instead.")]
+        [Obsolete($"Use {nameof(QueuedTaskHelperV2)}.{nameof(QueuedTaskHelperV2.Do)} instead.")]
         public static Task Do(object key, double delay, Action a) {
             lock (Timers) {
                 if (!Timers.TryGetValue(key, out Stopwatch timer)) {
@@ -63,11 +63,11 @@ namespace Celeste.Mod {
             }
         }
 
-        [Obsolete("Use QueuedTaskHelperV2.Get instead.")]
+        [Obsolete($"Use {nameof(QueuedTaskHelperV2)}.{nameof(QueuedTaskHelperV2.Get)} instead.")]
         public static Task<T> Get<T>(object key, Func<T> f)
             => Get(key, DefaultDelay, f);
 
-        [Obsolete("Use QueuedTaskHelperV2.Get instead.")]
+        [Obsolete($"Use {nameof(QueuedTaskHelperV2)}.{nameof(QueuedTaskHelperV2.Get)} instead.")]
         public static Task<T> Get<T>(object key, double delay, Func<T> f) {
             lock (Timers) {
                 if (!Timers.TryGetValue(key, out Stopwatch timer)) {
