@@ -371,7 +371,9 @@ namespace Celeste.Mod {
         }
 
         protected void CompleteTask() {
-            QueuedTaskHelperV2.RunningTasks.Remove(Key);
+            lock (QueuedTaskHelperV2.RunningTasks) {
+                QueuedTaskHelperV2.RunningTasks.Remove(Key);
+            }
         }
     }
 
