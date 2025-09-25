@@ -108,9 +108,8 @@ namespace Celeste.Mod {
         ///   Schedules the given <paramref name="delegate"/> to execute asynchronously after the <see cref="DefaultDelay"/>.
         /// </summary>
         /// <remarks>
-        ///   If a task with the same key is scheduled twice, the delay time spans will be overlaid.
-        ///   That is, when the first execution delays for <c>10</c> seconds, and a second execution that delays for <c>5</c> seconds
-        ///   is scheduled <c>7.5</c> seconds after the first one, the actual delay time becomes <c>12.5</c> seconds.
+        ///   When a task is scheduled while another task is still running, multiple outcomes can occur depending on the state of the delay.
+        ///   See <see cref="QueuedTaskBase.UpdateDelay"/> for details.
         /// </remarks>
         /// <param name="key">
         ///   The identifier of the task.
@@ -131,9 +130,8 @@ namespace Celeste.Mod {
         ///   Schedules the given <paramref name="delegate"/> to execute asynchronously after a given <paramref name="delay"/>.
         /// </summary>
         /// <remarks>
-        ///   If a task with the same key is scheduled twice, the delay time spans will be overlaid.
-        ///   That is, when the first execution delays for <c>10</c> seconds, and a second execution that delays for <c>5</c> seconds
-        ///   is scheduled <c>7.5</c> seconds after the first one, the actual delay time becomes <c>12.5</c> seconds.
+        ///   When a task is scheduled while another task is still running, multiple outcomes can occur depending on the state of the delay.
+        ///   See <see cref="QueuedTaskBase.UpdateDelay"/> for details.
         /// </remarks>
         /// <param name="key">
         ///   The identifier of the task.
@@ -157,9 +155,8 @@ namespace Celeste.Mod {
         ///   Schedules the given <paramref name="delegate"/> to execute asynchronously after a given <paramref name="delay"/>.
         /// </summary>
         /// <remarks>
-        ///   If a task with the same key is scheduled twice, the delay time spans will be overlaid.
-        ///   That is, when the first execution delays for <c>10</c> seconds, and a second execution that delays for <c>5</c> seconds
-        ///   is scheduled <c>7.5</c> seconds after the first one, the actual delay time becomes <c>12.5</c> seconds.
+        ///   When a task is scheduled while another task is still running, multiple outcomes can occur depending on the state of the delay.
+        ///   See <see cref="QueuedTaskBase.UpdateDelay"/> for details.
         /// </remarks>
         /// <param name="key">
         ///   The identifier of the task.
@@ -185,7 +182,7 @@ namespace Celeste.Mod {
                     if (baseTask is not QueuedTask existingTask)
                         throw new InvalidOperationException("A queued task with an incompatible type is already running.");
 
-                    existingTask.OverlayDelay(delay);
+                    existingTask.UpdateDelay(delay);
                     return existingTask;
                 }
 
@@ -199,9 +196,8 @@ namespace Celeste.Mod {
         ///   Schedules the given <paramref name="delegate"/> to execute asynchronously after the <see cref="DefaultDelay"/>.
         /// </summary>
         /// <remarks>
-        ///   If a task with the same key is scheduled twice, the delay time spans will be overlaid.
-        ///   That is, when the first execution delays for <c>10</c> seconds, and a second execution that delays for <c>5</c> seconds
-        ///   is scheduled <c>7.5</c> seconds after the first one, the actual delay time becomes <c>12.5</c> seconds.
+        ///   When a task is scheduled while another task is still running, multiple outcomes can occur depending on the state of the delay.
+        ///   See <see cref="QueuedTaskBase.UpdateDelay"/> for details.
         /// </remarks>
         /// <typeparam name="T">
         ///   The return type of <paramref name="delegate"/>.
@@ -225,9 +221,8 @@ namespace Celeste.Mod {
         ///   Schedules the given <paramref name="delegate"/> to execute asynchronously after a given <paramref name="delay"/>.
         /// </summary>
         /// <remarks>
-        ///   If a task with the same key is scheduled twice, the delay time spans will be overlaid.
-        ///   That is, when the first execution delays for <c>10</c> seconds, and a second execution that delays for <c>5</c> seconds
-        ///   is scheduled <c>7.5</c> seconds after the first one, the actual delay time becomes <c>12.5</c> seconds.
+        ///   When a task is scheduled while another task is still running, multiple outcomes can occur depending on the state of the delay.
+        ///   See <see cref="QueuedTaskBase.UpdateDelay"/> for details.
         /// </remarks>
         /// <typeparam name="T">
         ///   The return type of <paramref name="delegate"/>.
@@ -254,9 +249,8 @@ namespace Celeste.Mod {
         ///   Schedules the given <paramref name="delegate"/> to execute asynchronously after a given <paramref name="delay"/>.
         /// </summary>
         /// <remarks>
-        ///   If a task with the same key is scheduled twice, the delay time spans will be overlaid.
-        ///   That is, when the first execution delays for <c>10</c> seconds, and a second execution that delays for <c>5</c> seconds
-        ///   is scheduled <c>7.5</c> seconds after the first one, the actual delay time becomes <c>12.5</c> seconds.
+        ///   When a task is scheduled while another task is still running, multiple outcomes can occur depending on the state of the delay.
+        ///   See <see cref="QueuedTaskBase.UpdateDelay"/> for details.
         /// </remarks>
         /// <typeparam name="T">
         ///   The return type of <paramref name="delegate"/>.
@@ -285,7 +279,7 @@ namespace Celeste.Mod {
                     if (baseTask is not QueuedTask<T> existingTask)
                         throw new InvalidOperationException("A queued task with an incompatible type is already running.");
 
-                    existingTask.OverlayDelay(delay);
+                    existingTask.UpdateDelay(delay);
                     return existingTask;
                 }
 
@@ -313,7 +307,7 @@ namespace Celeste.Mod {
         /// <summary>
         ///   A task that will complete after the given delay.
         /// </summary>
-        /// <seealso cref="OverlayDelay"/>
+        /// <seealso cref="UpdateDelay"/>
         protected Task DelayTask { get; private set; }
 
         /// <summary>
@@ -324,17 +318,38 @@ namespace Celeste.Mod {
         protected QueuedTaskBase(object key, TimeSpan delay, CancellationToken cancellationToken) {
             Key = key;
             CancellationToken = cancellationToken;
-            OverlayDelay(delay);
+            UpdateDelay(delay);
         }
 
         /// <summary>
-        ///   Overlays a new delay on top of the existing one.
+        ///   Updates the delay depending on its status.
+        ///   <list type="table">
+        ///     <listheader>
+        ///       <term>Delay State</term>
+        ///       <description>Outcome</description>
+        ///     </listheader>
+        ///     <item>
+        ///       <term>Not yet awaited</term>
+        ///       <description>The delay is replaced</description>
+        ///     </item>
+        ///     <item>
+        ///       <term>Awaiting</term>
+        ///       <description>The delay is overlaid (see remarks)</description>
+        ///     </item>
+        ///     <item>
+        ///       <term>Awaited</term>
+        ///       <description>The delay is ignored, as the callback is already executing</description>
+        ///     </item>
+        ///   </list>
         /// </summary>
         /// <remarks>
-        ///   For example, when overlaying a <c>5</c>-second delay on top of a <c>10</c>-second delay,
+        ///   When overlaying a <c>5</c>-second delay on top of a <c>10</c>-second delay,
         ///   which starts <c>7.5</c> seconds after the first one, the total delay becomes <c>12.5</c> seconds.
         /// </remarks>
-        internal void OverlayDelay(TimeSpan delay) {
+        /// <exception cref="InvalidOperationException">
+        ///   Attempted to overlay a delay on a completed task.
+        /// </exception>
+        internal void UpdateDelay(TimeSpan delay) {
             if (Queued?.IsCompleted ?? false)
                 throw new InvalidOperationException("Cannot overlay a delay on a completed task.");
             DelayTask = Task.Delay(delay, CancellationToken);
@@ -344,7 +359,7 @@ namespace Celeste.Mod {
             // force the task to run asynchronously by yielding - we don't want to block the main thread
             await Task.Yield();
 
-            // we need to wait on loop because DelayTask could have been changed by OverlayDelay
+            // we need to wait on loop because DelayTask could have been changed by UpdateDelay
             do {
                 await DelayTask;
             } while (!DelayTask.IsCompleted);
