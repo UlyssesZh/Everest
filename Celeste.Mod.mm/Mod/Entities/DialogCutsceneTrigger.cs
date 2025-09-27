@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Monocle;
 
 namespace Celeste.Mod.Entities {
+    [Tracked]
     [CustomEntity("everest/dialogTrigger", "dialog/dialogtrigger", "cavern/dialogtrigger")]
     public class DialogCutsceneTrigger : Trigger {
 
@@ -36,6 +38,10 @@ namespace Celeste.Mod.Entities {
                 return;
 
             if (ignoreIntroState && ((patch_Player) player).IsIntroState)
+                return;
+
+            // don't activate if some dialog is already in progress
+            if (level.Tracker.GetEntity<Textbox>() is not null)
                 return;
 
             triggered = true;
