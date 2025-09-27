@@ -334,12 +334,12 @@ public class EverestSplashWindow {
         string[] startingCelesteText = { // DO Make sure that the longest string goes first, for caching reasons
             "Starting Celeste...", "Starting Celeste", "Starting Celeste.", "Starting Celeste.."
         };
-        double textAccDt = 0;
+        double textUpdateTimer = 0;
         // Set the first text
         windowInfo.startingEverestFontCache.SetText(startingCelesteText[startEverestSpriteIdx]);
         
         int realBgH = windowInfo.bgGradientTexture.Height * WindowWidth / windowInfo.bgGradientTexture.Width;
-        double bgBloomPos = -realBgH/2f;
+        double bgBloomPos = -realBgH/2.0;
         double wheelAngle = 0;
         double progressWidth = 0;
         double prevTarget = 0;
@@ -350,7 +350,7 @@ public class EverestSplashWindow {
 
         ulong prevTime = SDL.SDL_GetPerformanceCounter();
 
-        while (true) { // while true :trolloshiro: (on a serious note, for our use case its fineee :))
+        while (true) { // while true :trollshiro: (on a serious note, for our use case its fineee :))
             
             ulong nowTime = SDL.SDL_GetPerformanceCounter();
             double deltaTime = nowTime - prevTime;
@@ -360,7 +360,7 @@ public class EverestSplashWindow {
             while (SDL.SDL_PollEvent(out SDL.SDL_Event e) != 0) {
                 // An SDL_USEREVENT is sent when the splash receives the quit command
                 if (e.type is SDL.SDL_EventType.SDL_QUIT or SDL.SDL_EventType.SDL_USEREVENT) {
-                    // SDL_QUIT is currently the only way to exit early (other that crashing)
+                    // SDL_QUIT is currently the only way to exit early (other than crashing)
                     if (e.type is SDL.SDL_EventType.SDL_QUIT)
                         earlyExit = true;
                     return; // quit asap
@@ -368,12 +368,12 @@ public class EverestSplashWindow {
             }
             
             // Update state
-            bgBloomPos += 60f*deltaTime; // 60 px per second
-            if (bgBloomPos > realBgH/2f) {
-                bgBloomPos = -realBgH/2f;
+            bgBloomPos += 60.0*deltaTime; // 60 px per second
+            if (bgBloomPos > realBgH/2.0) {
+                bgBloomPos = -realBgH/2.0;
             }
             
-            wheelAngle += 6.0 * deltaTime; // 6 deg per second
+            wheelAngle += 6.0*deltaTime; // 6 deg per second
             // No value reset, it's an angle anyway
             
             if (loadingProgress.totalMods != 0) { // if 0 skip updating since it must have not initialized yet
@@ -381,25 +381,25 @@ public class EverestSplashWindow {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (prevTarget != target) { // Once the bar has to increase
                     prevStart = progressWidth; // Start from where it was left off
-                    progressWidthProgress = deltaTime*60; // And go ahead to step 1, there's no point in staying still for a frame
+                    progressWidthProgress = deltaTime*60.0; // And go ahead to step 1, there's no point in staying still for a frame
                     prevTarget = target;
                 }
                 // This is a domain extension from the natural numbers to the reals of
-                // `progressWidth = progressWidth + (target-progressWidth)*0.25f`.
+                // `progressWidth = progressWidth + (target-progressWidth)*0.25`.
                 // If we relabel it as a function over the naturals: S(n) = S(n-1) + (target-S(n-1))*0.25 and derive
                 // a closed form for S(n), then the trivial domain extension of that function to the reals is used here.
                 // This is due to the need to support different frame rates, since the idea is that an iteration occurs 
                 // each frame at 60fps, so this is the easiest way to approximate it to other (possibly coprime) framerates.
-                progressWidth = target + (prevStart-target) * double.Pow(1-0.25f, progressWidthProgress);
+                progressWidth = target + (prevStart-target) * double.Pow(1-0.25, progressWidthProgress);
                 progressWidthProgress += deltaTime*60;
             }
 
-            if (textAccDt >= 0.5) { // Swap every 0.5 seconds
+            if (textUpdateTimer >= 0.5) { // Swap every 0.5 seconds
                 windowInfo.startingEverestFontCache.SetText(startingCelesteText[startEverestSpriteIdx]);
                 startEverestSpriteIdx = (startEverestSpriteIdx + 1) % startingCelesteText.Length;
-                textAccDt = 0;
+                textUpdateTimer = 0;
             }
-            textAccDt += deltaTime;
+            textUpdateTimer += deltaTime;
 
             // BG color generation
             Color bgColor = bgDark;
