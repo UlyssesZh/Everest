@@ -22,18 +22,21 @@ namespace Celeste.Mod.Entities {
         }
 
         public override void OnEnter(Player player) {
-            if (triggered || (Scene as Level).Session.GetFlag("DoNotLoad" + id) ||
-                (deathCount >= 0 && SceneAs<Level>().Session.DeathsInCurrentLevel != deathCount)) {
-
+            if (Scene is not Level level)
                 return;
-            }
+
+            if (triggered || (deathCount >= 0 && level.Session.DeathsInCurrentLevel != deathCount))
+                return;
 
             triggered = true;
 
             Scene.Add(new DialogCutscene(dialogEntry, player, endLevel));
 
-            if (onlyOnce)
-                (Scene as Level).Session.SetFlag("DoNotLoad" + id, true); // Sets flag to not load
+            if (onlyOnce) {
+                // can't remove the flag, some maps might depend on it
+                level.Session.SetFlag("DoNotLoad" + id, true);
+                level.Session.DoNotLoad.Add(id);
+            }
         }
 
     }
