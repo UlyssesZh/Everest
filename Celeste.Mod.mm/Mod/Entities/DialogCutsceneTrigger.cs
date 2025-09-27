@@ -27,7 +27,25 @@ namespace Celeste.Mod.Entities {
             id = entId;
         }
 
+        // do not remove OnEnter! doing so will break maps that rely on third-party triggers to start dialog cutscenes.
+        // vanilla naturally calls OnEnter and OnStay in the same frame when entering the trigger,
+        // which would mean that we don't need the OnEnter method.
+        // however, sj's "in filtration" uses a Trigger Trigger (CrystallineHelper) to start a dialog cutscene;
+        // it only calls OnEnter and not OnStay, so removing OnEnter will make the dialog not appear and cause a tas desync!
+        public override void OnEnter(Player player) {
+            TriggerCutscene(player);
+        }
+
         public override void OnStay(Player player) {
+            TriggerCutscene(player);
+        }
+
+        public override void OnLeave(Player player) {
+            if (!triggerOnlyOnce)
+                triggered = false;
+        }
+
+        private void TriggerCutscene(Player player) {
             if (Scene is not Level level)
                 return;
 
@@ -54,11 +72,5 @@ namespace Celeste.Mod.Entities {
                 level.Session.DoNotLoad.Add(id);
             }
         }
-
-        public override void OnLeave(Player player) {
-            if (!triggerOnlyOnce)
-                triggered = false;
-        }
-
     }
 }
