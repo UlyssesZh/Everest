@@ -201,30 +201,32 @@ namespace Monocle {
             }
 
             // Keep original order of existing instances
-            // Especially important for the PlayerCollider component for example
+            // Especially important in the case of overlapping PlayerCollider components
             foreach (Type entityType in StoredEntityTypes) {
-                ref var newList = ref CollectionsMarshal.GetValueRefOrAddDefault(tracker.Entities, entityType, out _);
-                if (newList == null || !origEntities.TryGetValue(entityType, out var oldList)) {
+                var newList = tracker.Entities[entityType];
+                if (!origEntities.TryGetValue(entityType, out var oldList)) {
                     continue;
                 }
 
                 newList.Sort((lhs, rhs) => {
                     int lhsIdx = oldList.IndexOf(lhs);
                     int rhsIdx = oldList.IndexOf(rhs);
+                    if (lhsIdx == rhsIdx) return 0;
                     if (lhsIdx == -1) return  1;
                     if (rhsIdx == -1) return -1;
                     return lhsIdx - rhsIdx;
                 });
             }
             foreach (Type componentType in StoredComponentTypes) {
-                ref var newList = ref CollectionsMarshal.GetValueRefOrAddDefault(tracker.Components, componentType, out _);
-                if (newList == null || !origComponents.TryGetValue(componentType, out var oldList)) {
+                var newList = tracker.Components[componentType];
+                if (!origComponents.TryGetValue(componentType, out var oldList)) {
                     continue;
                 }
 
                 newList.Sort((lhs, rhs) => {
                     int lhsIdx = oldList.IndexOf(lhs);
                     int rhsIdx = oldList.IndexOf(rhs);
+                    if (lhsIdx == rhsIdx) return 0;
                     if (lhsIdx == -1) return  1;
                     if (rhsIdx == -1) return -1;
                     return lhsIdx - rhsIdx;
