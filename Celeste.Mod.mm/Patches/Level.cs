@@ -916,11 +916,16 @@ namespace MonoMod {
             FieldDefinition f_DecalData_Depth    = t_DecalData.FindField("Depth");
 
             FieldDefinition f_Decal_DepthSetByPlacement = t_Decal.FindField("DepthSetByPlacement");
+            FieldDefinition f_Decal_ParallaxSetByPlacement = t_Decal.FindField("ParallaxSetByPlacement");
 
             MethodDefinition m_DecalData_HasDepth = t_DecalData.FindMethod("HasDepth");
             MethodDefinition m_DecalData_GetDepth = t_DecalData.FindMethod("GetDepth");
 
-            MethodDefinition m_Decal_ctor = t_Decal.FindMethod("System.Void .ctor(System.String,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,System.Int32,System.Single,System.String)");
+            MethodDefinition m_DecalData_HasParallax = t_DecalData.FindMethod("HasParallax");
+            MethodDefinition m_DecalData_GetParallax = t_DecalData.FindMethod("GetParallax");
+
+            MethodDefinition m_Decal_ctor         = t_Decal.FindMethod("System.Void .ctor(System.String,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,System.Int32,System.Single,System.String)");
+            MethodDefinition m_Decal_MakeParallax = t_Decal.FindMethod("MakeParallax");
 
             ILCursor cursor = new ILCursor(context);
 
@@ -948,16 +953,32 @@ namespace MonoMod {
                 cursor.Emit(OpCodes.Newobj, m_Decal_ctor);
                 cursor.Remove();
 
-                // if the depth was set in the DecalData...
-                ILLabel after_set = cursor.DefineLabel();
+                // if the depth was set in the DecalData (and therefore is already set on the Decal)...
+                ILLabel after_set_depth = cursor.DefineLabel();
                 cursor.Emit(OpCodes.Ldloc_S, (byte) loc_decaldata);
                 cursor.Emit(OpCodes.Call, m_DecalData_HasDepth);
-                cursor.Emit(OpCodes.Brfalse_S, after_set);
+                cursor.Emit(OpCodes.Brfalse_S, after_set_depth);
                 // store that information in the Decal
                 cursor.Emit(OpCodes.Dup);
                 cursor.Emit(OpCodes.Ldc_I4_1);
                 cursor.Emit(OpCodes.Stfld, f_Decal_DepthSetByPlacement);
-                cursor.MarkLabel(after_set);
+                cursor.MarkLabel(after_set_depth);
+
+                // if the parallax was set in the DecalData (but not yet on the Decal)...
+                ILLabel after_set_parallax = cursor.DefineLabel();
+                cursor.Emit(OpCodes.Ldloc_S, (byte) loc_decaldata);
+                cursor.Emit(OpCodes.Call, m_DecalData_HasParallax);
+                cursor.Emit(OpCodes.Brfalse_S, after_set_parallax);
+                // set the parallax...
+                cursor.Emit(OpCodes.Dup);
+                cursor.Emit(OpCodes.Ldloc_S, (byte) loc_decaldata);
+                cursor.Emit(OpCodes.Call, m_DecalData_GetParallax);
+                cursor.Emit(OpCodes.Call, m_Decal_MakeParallax);
+                // ...and finally the fact that the parallax was set here
+                cursor.Emit(OpCodes.Dup);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+                cursor.Emit(OpCodes.Stfld, f_Decal_ParallaxSetByPlacement);
+                cursor.MarkLabel(after_set_parallax);
 
                 matches++;
             }
