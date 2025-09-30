@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Timer = System.Timers.Timer;
 
 namespace EverestSplash;
 
@@ -330,52 +329,77 @@ public class EverestSplashWindow {
     private void HandleWindow() {
         SDL.SDL_ShowWindow(windowInfo.window);
 
-        // Animation values, SDL timers are a pain to use, this is easier
+        // Global loop vars
         int startEverestSpriteIdx = 0;
         string[] startingCelesteText = { // DO Make sure that the longest string goes first, for caching reasons
             "Starting Celeste...", "Starting Celeste", "Starting Celeste.", "Starting Celeste.."
         };
-        AnimTimer(500, () => {
-            windowInfo.startingEverestFontCache.SetText(startingCelesteText[startEverestSpriteIdx]);
-            startEverestSpriteIdx = (startEverestSpriteIdx + 1) % startingCelesteText.Length;
-        });
+        double textUpdateTimer = 0;
+        // Set the first text
+        windowInfo.startingEverestFontCache.SetText(startingCelesteText[startEverestSpriteIdx]);
         
         int realBgH = windowInfo.bgGradientTexture.Height * WindowWidth / windowInfo.bgGradientTexture.Width;
-        int bgBloomPos = -realBgH/2;
-        AnimTimer(16, () => {
-            bgBloomPos += 1;
-            if (bgBloomPos > realBgH/2) {
-                bgBloomPos = -realBgH/2;
-            }
-        });
+        double bgBloomPos = -realBgH/2.0;
         double wheelAngle = 0;
-        AnimTimer(16, () => {
-            wheelAngle += 0.1;
-            // No value reset, it's an angle anyways
-        });
-        float progressWidth = 0;
-        float prevProgress = 0;
-        AnimTimer(16, () => {
-            if (loadingProgress.totalMods == 0) { // skip updating since it must have not initialized yet
-                return;
-            }
-            progressWidth = (float)loadingProgress.loadedMods/loadingProgress.totalMods * WindowWidth*0.25f + prevProgress*0.75f;
-            prevProgress = progressWidth;
-        });
+        double progressWidth = 0;
+        double prevTarget = 0;
+        double prevStart = 0;
+        double progressWidthProgress = 0;
 
         windowInfo.modLoadingProgressCache.SetText("Loading..."); // Default to "Loading..."
 
-        while (true) { // while true :trolloshiro: (on a serious note, for our use case its fineee :))
+        ulong prevTime = SDL.SDL_GetPerformanceCounter();
+
+        while (true) { // while true :trollshiro: (on a serious note, for our use case its fineee :))
+            
+            ulong nowTime = SDL.SDL_GetPerformanceCounter();
+            double deltaTime = nowTime - prevTime;
+            deltaTime /= SDL.SDL_GetPerformanceFrequency();
+            prevTime = nowTime;
             
             while (SDL.SDL_PollEvent(out SDL.SDL_Event e) != 0) {
                 // An SDL_USEREVENT is sent when the splash receives the quit command
                 if (e.type is SDL.SDL_EventType.SDL_QUIT or SDL.SDL_EventType.SDL_USEREVENT) {
-                    // SDL_QUIT is currently the only way to exit early (other that crashing)
+                    // SDL_QUIT is currently the only way to exit early (other than crashing)
                     if (e.type is SDL.SDL_EventType.SDL_QUIT)
                         earlyExit = true;
                     return; // quit asap
                 }
             }
+            
+            // Update state
+            bgBloomPos += 60.0*deltaTime; // 60 px per second
+            if (bgBloomPos > realBgH/2.0) {
+                bgBloomPos = -realBgH/2.0;
+            }
+            
+            wheelAngle += 6.0*deltaTime; // 6 deg per second
+            // No value reset, it's an angle anyway
+            
+            if (loadingProgress.totalMods != 0) { // if 0 skip updating since it must have not initialized yet
+                float target = (float) loadingProgress.loadedMods / loadingProgress.totalMods * WindowWidth;
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (prevTarget != target) { // Once the bar has to increase
+                    prevStart = progressWidth; // Start from where it was left off
+                    progressWidthProgress = deltaTime*60.0; // And go ahead to step 1, there's no point in staying still for a frame
+                    prevTarget = target;
+                }
+                // This is a domain extension from the natural numbers to the reals of
+                // `progressWidth = progressWidth + (target-progressWidth)*0.25`.
+                // If we relabel it as a function over the naturals: S(n) = S(n-1) + (target-S(n-1))*0.25 and derive
+                // a closed form for S(n), then the trivial domain extension of that function to the reals is used here.
+                // This is due to the need to support different frame rates, since the idea is that an iteration occurs 
+                // each frame at 60fps, so this is the easiest way to approximate it to other (possibly coprime) framerates.
+                progressWidth = target + (prevStart-target) * double.Pow(1-0.25, progressWidthProgress);
+                progressWidthProgress += deltaTime*60;
+            }
+
+            if (textUpdateTimer >= 0.5) { // Swap every 0.5 seconds
+                windowInfo.startingEverestFontCache.SetText(startingCelesteText[startEverestSpriteIdx]);
+                startEverestSpriteIdx = (startEverestSpriteIdx + 1) % startingCelesteText.Length;
+                textUpdateTimer = 0;
+            }
+            textUpdateTimer += deltaTime;
 
             // BG color generation
             Color bgColor = bgDark;
@@ -385,16 +409,16 @@ public class EverestSplashWindow {
             // BG bloom drawing
             SDL.SDL_Rect bgRect = new() {
                 x = 0,
-                y = bgBloomPos,
+                y = (int)bgBloomPos,
                 w = WindowWidth,
                 h = realBgH, // We calculated this earlier for the animation
             };
             SDL.SDL_RenderCopy(windowInfo.renderer, windowInfo.bgGradientTexture.Handle, IntPtr.Zero, ref bgRect);
             // Draw another one above because it tiles nicely
-            bgRect.y = bgBloomPos - bgRect.h;
+            bgRect.y = (int)bgBloomPos - bgRect.h;
             SDL.SDL_RenderCopy(windowInfo.renderer, windowInfo.bgGradientTexture.Handle, IntPtr.Zero, ref bgRect);
             // Finally, draw another one below the first one (mostly for 16:9 mode)
-            bgRect.y = bgBloomPos + bgRect.h;
+            bgRect.y = (int)bgBloomPos + bgRect.h;
             SDL.SDL_RenderCopy(windowInfo.renderer, windowInfo.bgGradientTexture.Handle, IntPtr.Zero, ref bgRect);
 
 
@@ -472,11 +496,6 @@ public class EverestSplashWindow {
         // I mean it makes sense, this un-initializes everything, something FNA doesn't expect :P
         SDL.SDL_Quit();
 
-        foreach (Timer timer in timers) {
-            timer.Stop();
-            timer.Dispose();
-        }
-        timers.Clear();
         tokenSource.Cancel(); // Make sure the read thread is gone
     }
 
@@ -536,16 +555,6 @@ public class EverestSplashWindow {
         }
         Console.WriteLine($"Renderer target: {targetRenderer} not found or available");
         return -1; // requested renderer is not available, use anything
-    }
-
-    private List<Timer> timers = new();
-    private void AnimTimer(int ms, Action cb) {
-        cb(); // Call it instantly to guarantee all cb have ran before the update loop
-        Timer animTimer = new(ms);
-        animTimer.Elapsed += (_, _) => { cb(); };
-        animTimer.AutoReset = true;
-        animTimer.Enabled = true;
-        timers.Add(animTimer);
     }
 
 
