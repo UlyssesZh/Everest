@@ -558,9 +558,6 @@ namespace Celeste {
                     Container.Add(item.ValueWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     Container.Add(item.SelectWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     item.ValueWiggler.UseRawDeltaTime = (item.SelectWiggler.UseRawDeltaTime = true);
-                    if (Selection == -1) {
-                        FirstSelection();
-                    }
                     RecalculateSize();
                     item.Added();
                     return this;
@@ -583,9 +580,6 @@ namespace Celeste {
                     Container.Add(item.ValueWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     Container.Add(item.SelectWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     item.ValueWiggler.UseRawDeltaTime = (item.SelectWiggler.UseRawDeltaTime = true);
-                    if (Selection == -1) {
-                        FirstSelection();
-                    }
                     RecalculateSize();
                     item.Added();
                     return this;
@@ -763,12 +757,12 @@ namespace Celeste {
                 if (Items.Count > 0) {
                     Container.Focused = false;
                     Focused = true;
+                    containerAutoScroll = Container.AutoScroll;
+                    Container.AutoScroll = false;
                     if (Input.MenuUp.Pressed)
                         LastSelection();
                     else
                         FirstSelection();
-                    containerAutoScroll = Container.AutoScroll;
-                    Container.AutoScroll = false;
                     if (!Input.MenuUp.Repeating && !Input.MenuDown.Repeating)
                         Audio.Play(ConfirmSfx);
                     base.ConfirmPressed();
