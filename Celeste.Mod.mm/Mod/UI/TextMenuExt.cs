@@ -446,7 +446,7 @@ namespace Celeste {
             /// <inheritdoc cref="TextMenu.Current"/>
             public TextMenu.Item Current {
                 get {
-                    if (Items.Count <= 0 || Selection < 0) {
+                    if (Items.Count <= 0 || Selection < 0 || Selection >= Items.Count) {
                         return null;
                     }
                     return Items[Selection];
@@ -640,8 +640,8 @@ namespace Celeste {
             /// Set the selection to the last possible <see cref="TextMenu.Item"/>.
             /// </summary>
             public void LastSelection() {
-                Selection = LastPossibleSelection;
-                MoveSelection(0, false);
+                Selection = Items.Count;
+                MoveSelection(-1, false);
             }
 
             /// <inheritdoc cref="TextMenu.MoveSelection(int, bool)"/>
