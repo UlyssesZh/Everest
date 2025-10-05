@@ -485,7 +485,9 @@ namespace Celeste {
                 get {
                     float min = Engine.Height - 150f - Container.Height * Container.Justify.Y;
                     float max = 150f + Container.Height * Container.Justify.Y;
-                    return Calc.Clamp((Engine.Height / 2) + Container.Height * Container.Justify.Y - GetYOffsetOf(Current), min, max);
+
+                    float y_offset = Current is not null ? GetYOffsetOf(Current) : GetYOffsetOf(Items[Calc.Clamp(Selection, 0, Items.Count-1)]);
+                    return Calc.Clamp((Engine.Height / 2) + Container.Height * Container.Justify.Y - y_offset, min, max);
                 }
             }
 
@@ -507,6 +509,7 @@ namespace Celeste {
             public bool Focused;
 
             private bool enterOnSelect;
+            private bool entering;
             private float ease;
 
             private bool containerAutoScroll;
@@ -655,7 +658,7 @@ namespace Celeste {
                 }
                 do {
                     Selection += direction;
-                    if (enterOnSelect) {
+                    if (enterOnSelect && !entering) {
                         if (Selection < 0 || Selection >= Items.Count) {
                             // Avoid crash when getting Current item
                             Selection = selection;
@@ -681,7 +684,7 @@ namespace Celeste {
                     Selection = selection;
                 }
                 if (Selection != selection && Current != null) {
-                    if (selection >= 0 && Items[selection] != null && Items[selection].OnLeave != null) {
+                    if (selection >= 0 && selection < Items.Count && Items[selection] != null && Items[selection].OnLeave != null) {
                         Items[selection].OnLeave();
                     }
                     Current.OnEnter?.Invoke();
@@ -759,10 +762,14 @@ namespace Celeste {
                     Focused = true;
                     containerAutoScroll = Container.AutoScroll;
                     Container.AutoScroll = false;
+
+                    entering = true;
                     if (Input.MenuUp.Pressed)
                         LastSelection();
                     else
                         FirstSelection();
+                    entering = false;
+
                     if (!Input.MenuUp.Repeating && !Input.MenuDown.Repeating)
                         Audio.Play(ConfirmSfx);
                     base.ConfirmPressed();
