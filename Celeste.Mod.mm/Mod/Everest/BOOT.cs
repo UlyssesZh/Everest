@@ -53,19 +53,25 @@ namespace Celeste.Mod {
                 // So probe for it before continuing to boot on Linux
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                     [DllImport("libc", SetLastError = true)]
+                    static extern nuint getpagesize();
+
+                    [DllImport("libc", SetLastError = true)]
                     static extern int mprotect(IntPtr ptr, nuint len, int prot);
                     const int PROT_READ = 1, PROT_WRITE = 2, PROT_EXEC = 4;
 
+                    //Figure out page size
+                    nuint pageSize = getpagesize();
+
                     //Allocate a bit of memory on the heap
                     IntPtr heapAlloc = Marshal.AllocHGlobal(123);
-                    IntPtr heapPage = heapAlloc & ~0xfff;
+                    IntPtr heapPage = heapAlloc & ~((nint)(pageSize - 1));
 
                     //Try to make it executable
-                    if (mprotect(heapPage, 0x1000, PROT_READ | PROT_WRITE | PROT_EXEC) < 0)
+                    if (mprotect(heapPage, pageSize, PROT_READ | PROT_WRITE | PROT_EXEC) < 0)
                         throw new Win32Exception(Marshal.GetLastPInvokeError(), "SELinux execheap probe failed! Please ensure Everest has this permission, then try again");
 
                     //Cleanup
-                    if (mprotect(heapPage, 0x1000, PROT_READ | PROT_WRITE) < 0)
+                    if (mprotect(heapPage, pageSize, PROT_READ | PROT_WRITE) < 0)
                         throw new Win32Exception(Marshal.GetLastPInvokeError(), "Failed to revert memory permissions after SELinux execheap probe");
 
                     Marshal.FreeHGlobal(heapAlloc);
