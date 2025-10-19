@@ -15,6 +15,14 @@ namespace Celeste {
         
         [MonoModIgnore]
         [ForceNoInlining]
+        public extern bool HasPlayerClimbing();
+        
+        [MonoModIgnore]
+        [ForceNoInlining]
+        public extern bool HasPlayerOnTop();
+        
+        [MonoModIgnore]
+        [ForceNoInlining]
         public extern bool HasPlayerRider();
     }
 }
