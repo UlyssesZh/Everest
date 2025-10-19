@@ -90,6 +90,7 @@ namespace Celeste {
         public static void RefreshLanguages() {
             PostLanguageLoad();
             MissingDialogIds.Clear();
+            InvalidDialogIds.Clear();
             Dialog.Language = Dialog.Languages[Dialog.Language.Id];
         }
 
@@ -194,6 +195,11 @@ namespace Celeste {
             if (language != FallbackLanguage && FallbackLanguage.Dialog.TryGetValue(name, out result))
                 return result;
 
+            if (!IsValidId(name)) {
+                WarnInvalidDialogId(name);
+                return $"<INVALID> [{name}]";
+            }
+
             WarnMissingDialogId(name, language);
             return "[" + name + "]";
         }
@@ -212,6 +218,11 @@ namespace Celeste {
 
             if (language != FallbackLanguage && FallbackLanguage.Cleaned.TryGetValue(name, out result))
                 return result;
+
+            if (!IsValidId(name)) {
+                WarnInvalidDialogId(name);
+                return $"<INVALID> {{{name}}}";
+            }
 
             WarnMissingDialogId(name, language);
             return "{" + name + "}";
@@ -232,7 +243,12 @@ namespace Celeste {
             if (cleaned != null)
                 return cleaned;
 
-            WarnMissingDialogId(name, isLevelSet: true);
+            if (!IsValidId(name))
+                // don't return a value that shows "invalid", because we're spacing it out anyway
+                // besides, people will see that it's invalid from the map name
+                WarnInvalidDialogId(name, isLevelSet: true);
+            else
+                WarnMissingDialogId(name, isLevelSet: true);
             return name.SpacedPascalCase();
         }
 
@@ -262,6 +278,37 @@ namespace Celeste {
             Logger.Warn("Dialog", logBuilder.ToString());
         }
 
+        /// <summary>
+        /// Log a warn whenever a Dialog ID contains invalid (non-alphanumeric-or-underscore) characters.
+        /// </summary>
+        /// <param name="dialogId">Dialog ID which contains invalid characters</param>
+        /// <param name="isLevelSet">Whether this is a level set Dialog ID</param>
+        private static void WarnInvalidDialogId(string dialogId, bool isLevelSet = false) {
+            if (!InvalidDialogIds.Add(dialogId))
+                return;
+
+            StringBuilder logBuilder = new();
+
+            if (isLevelSet)
+                logBuilder.Append("Level set ");
+
+            logBuilder.Append($"Dialog ID \"{dialogId}\" contains invalid characters!");
+
+            Logger.Warn("Dialog", logBuilder.ToString());
+        }
+
+        /// <summary>
+        /// Check if a Dialog ID is valid (contains only alphanumeric or underscore characters)
+        /// </summary>
+        /// <param name="dialogId"></param>
+        /// <returns></returns>
+        private static bool IsValidId(string dialogId) {
+            foreach (char c in dialogId)
+                if (!(char.IsAsciiLetterOrDigit(c) || c == '_'))
+                    return false;
+            return true;
+        }
+
         // can't move the field higher up, else MonoMod causes a member name conflict in a compiler generated class
         // see https://github.com/MonoMod/MonoMod/issues/73
 
@@ -270,6 +317,12 @@ namespace Celeste {
         /// It is reset whenever <see cref="AssetReloadHelper"/> reloads the current language.
         /// </summary>
         public static readonly HashSet<string> MissingDialogIds = new();
+
+        /// <summary>
+        /// Contains all Dialog IDs which are invalid and will never resolve to a translation.
+        /// It is reset whenever <see cref="AssetReloadHelper"/> reloads the current language.
+        /// </summary>
+        public static readonly HashSet<string> InvalidDialogIds = new();
 
     }
     public static class DialogExt {
