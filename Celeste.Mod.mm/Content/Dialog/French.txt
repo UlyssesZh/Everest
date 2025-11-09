@@ -128,11 +128,14 @@
 	MODOPTIONS_COREMODULE_PSTEXTHIGHLIGHT=					Sélection d'une option
 	MODOPTIONS_COREMODULE_PSTEXTHIGHLIGHT_DESC=				Contrôle si l'option sélectionnée clignote dans les menus.
 	
-	MODOPTIONS_COREMODULE_MIRRORPREFERENCES=				Utiliser un miroir par défaut
+	MODOPTIONS_COREMODULE_MIRRORPREFERENCES=				Miroir pour le téléchargement de mods
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_GB=				Désactivé
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_JADE=			Allemagne
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_WEGFAN=			Chine
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_OTOBOT=			Amérique du Nord
+
+	MODOPTIONS_COREMODULE_USEAPIMIRROR= 				    Miroir pour la base de données
+	MODOPTIONS_COREMODULE_USEAPIMIRROR_DESC=			    Peut aider en cas d'erreur "Le téléchargement de la base de données a échoué"
 
 	MODOPTIONS_COREMODULE_NOTLOADED_A= 						Certains mods n'ont pas pu être chargés.
 	MODOPTIONS_COREMODULE_NOTLOADED_B= 						Ouvre le fichier log.txt pour plus d'informations.

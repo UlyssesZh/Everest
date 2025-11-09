@@ -191,8 +191,14 @@ namespace Celeste.Mod.Helpers {
         /// This should point to a running instance of https://github.com/maddie480/EverestUpdateCheckerServer.
         /// </summary>
         private static string getModUpdaterDatabaseUrl(string database) {
+            if (CoreModule.Settings.UseAPIMirror) {
+                Logger.Info("ModUpdaterHelper", $"Using mirror for {database} database");
+                if (database == "modupdater") return "https://everestapi.github.io/updatermirror/everest_update.yaml";
+                if (database == "modgraph") return "https://everestapi.github.io/updatermirror/mod_dependency_graph.yaml";
+            }
+
             using (HttpClient hc = new CompressedHttpClient()) {
-                Logger.Verbose("ModUpdaterHelper", "Fetching mod updater database URL");
+                Logger.Verbose("ModUpdaterHelper", $"Fetching {database} database URL");
                 return hc.GetStringAsync("https://everestapi.github.io/" + database + ".txt").Result.Trim();
             }
         }
