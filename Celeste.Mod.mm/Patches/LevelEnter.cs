@@ -58,8 +58,10 @@ namespace Celeste {
         }
 
         public static bool PlayCustomVignette(Session session, bool fromSaveData) {
-            if (Everest.Events.LevelEnter.PlayVignette(session, fromSaveData))
+            if (Everest.Events.LevelEnter.PlayVignette(session, fromSaveData) is { } nextScene) {
+                Engine.Scene = nextScene;
                 return true;
+            }
 
             bool playVignette = !fromSaveData && session.StartedFromBeginning;
             patch_AreaData area = patch_AreaData.Get(session);

@@ -107,23 +107,23 @@ namespace Celeste.Mod {
             }
 
             public static class LevelEnter {
-                public delegate bool CustomVignetteHandler(_Session session, bool fromSaveData);
+                public delegate Scene CustomVignetteHandler(_Session session, bool fromSaveData);
                 /// <summary>
                 /// Called at the beginning of <see cref="_LevelEnter.PlayCustomVignette()"/>.<br/>
                 /// Invoked when entering a map, before instantiating and setting the next scene.<br/>
-                /// Allows the user to conditionally set the next scene, and should return true if successful.
+                /// Should return the next scene to set if some conditions are met, or null otherwise.
                 /// </summary>
                 public static event CustomVignetteHandler OnPlayVignette;
-                internal static bool PlayVignette(_Session session, bool fromSaveData) {
+                internal static Scene PlayVignette(_Session session, bool fromSaveData) {
                     if (OnPlayVignette is null)
-                        return false;
+                        return null;
 
                     foreach (CustomVignetteHandler handler in OnPlayVignette.GetInvocationList()) {
-                        if (handler(session, fromSaveData))
-                            return true;
+                        if (handler(session, fromSaveData) is { } nextScene)
+                            return nextScene;
                     }
 
-                    return false;
+                    return null;
                 }
             }
 
