@@ -192,9 +192,14 @@ namespace Celeste.Mod.Helpers {
         /// </summary>
         private static string getModUpdaterDatabaseUrl(string database) {
             if (CoreModule.Settings.UseAPIMirror) {
-                Logger.Info("ModUpdaterHelper", $"Using mirror for {database} database");
-                if (database == "modupdater") return "https://everestapi.github.io/updatermirror/everest_update.yaml";
-                if (database == "modgraph") return "https://everestapi.github.io/updatermirror/mod_dependency_graph.yaml";
+                if (database == "modupdater") {
+                    Logger.Info("ModUpdaterHelper", $"Using mirror for {database} database");
+                    return "https://everestapi.github.io/updatermirror/everest_update.yaml";
+                }
+                if (database == "modgraph") {
+                    Logger.Info("ModUpdaterHelper", $"Using mirror for {database} database");
+                    return "https://everestapi.github.io/updatermirror/mod_dependency_graph.yaml";
+                }
             }
 
             using (HttpClient hc = new CompressedHttpClient()) {
