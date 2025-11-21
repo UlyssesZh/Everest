@@ -231,10 +231,15 @@ namespace Celeste.Mod {
             private static readonly object _getUpdaterURLLock = new object();
 
             private static string GetEverestUpdaterDatabaseURL() {
+                if (CoreModule.Settings.UseAPIMirror) {
+                    Logger.Info("updater", "Using mirror for the Everest updater database");
+                    return "https://everestapi.github.io/updatermirror/everest_versions.json";
+                }
+
                 lock (_getUpdaterURLLock) {
                     if (string.IsNullOrEmpty(_everestUpdaterDatabaseURL)) {
                         using (HttpClient hc = new CompressedHttpClient()) {
-                            Logger.Verbose("updater", "Fetching everest updater database URL");
+                            Logger.Verbose("updater", "Fetching Everest updater database URL");
 
                             UriBuilder uri = new UriBuilder(hc.GetStringAsync("https://everestapi.github.io/everestupdater.txt").Result.Trim());
                             if ((uri.Query?.Length ?? 0) > 1)
