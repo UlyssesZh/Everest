@@ -371,11 +371,11 @@ namespace Celeste.Mod {
 
             public void AppendFormatted<T>(T value) => _handler.AppendFormatted(value);
             
-            public void AppendFormatted<T>(T value, string format) => _handler.AppendFormatted(value);
+            public void AppendFormatted<T>(T value, string format) => _handler.AppendFormatted(value, format);
             
             public void AppendFormatted<T>(T value, int alignment) => _handler.AppendFormatted(value, alignment);
             
-            public void AppendFormatted<T>(T value, int alignment, string format) => _handler.AppendFormatted(value, alignment);
+            public void AppendFormatted<T>(T value, int alignment, string format) => _handler.AppendFormatted(value, alignment, format);
             
             public void AppendFormatted(scoped ReadOnlySpan<char> value) => _handler.AppendFormatted(value);
             
@@ -412,12 +412,12 @@ namespace Celeste.Mod {
 
             public void AppendFormatted<T>(T value) => _handler.AppendFormatted(value);
             
-            public void AppendFormatted<T>(T value, string format) => _handler.AppendFormatted(value);
+            public void AppendFormatted<T>(T value, string format) => _handler.AppendFormatted(value, format);
             
             public void AppendFormatted<T>(T value, int alignment) => _handler.AppendFormatted(value, alignment);
             
-            public void AppendFormatted<T>(T value, int alignment, string format) => _handler.AppendFormatted(value, alignment);
-            
+            public void AppendFormatted<T>(T value, int alignment, string format) => _handler.AppendFormatted(value, alignment, format);
+
             public void AppendFormatted(scoped ReadOnlySpan<char> value) => _handler.AppendFormatted(value);
             
             public void AppendFormatted(scoped ReadOnlySpan<char> value, int alignment, string format = null) =>
