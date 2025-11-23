@@ -286,6 +286,9 @@ namespace Celeste.Mod.Core {
         // Keep in sync with https://github.com/EverestAPI/Olympus/blob/main/src/scenes/options.lua :: mirrorPreferences
         public string MirrorPreferences { get; set; } = "gb,jade,otobot,wegfan";
 
+        [SettingSubText("MODOPTIONS_COREMODULE_USEAPIMIRROR_DESC")]
+        public bool UseAPIMirror { get; set; } = false;
+
         public bool DiscordRichPresence { get; set; } = true;
 
         [SettingIgnore]

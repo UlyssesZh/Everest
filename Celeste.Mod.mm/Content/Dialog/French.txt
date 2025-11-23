@@ -1,19 +1,19 @@
 ﻿# Check English.txt for up-to-date notes.
 
 # Helper Postcards
-	POSTCARD_LEVELGONE= 		{big}Merci ((player)) !{/big}{n}Mais {#ff1144}((sid)){#} est dans une autre montagne.
-	POSTCARD_LEVELLOADFAILED= 	{big}Désolé !{/big}{n}Mais {#ff1144}((sid)){#}{n}n'a pas pu être chargé.{n}Envoyez votre {#44adf7}log.txt{#}{n}au créateur de la map.
-	POSTCARD_LEVELNOSPAWN= 		{big}Oups !{/big}{n}Quelqu'un a mal placé{n}votre {#44adf7}point de départ !{#}{n}Vérifiez que votre map{n}contient une entité {#44adf7}Player{#}.
-	POSTCARD_BADTILEID=			{big}Oups !{/big}{n}Une ((type))tile inexistante dont l'id est {#ff1144}((id)){#} est présente à la position{n}{#ff1144}(((x)), ((y))){#} dans la salle {#ff1144}((room)){#}{n}Vérifiez le fichier {#44adf7}log.txt{#} pour plus d'informations.
-	POSTCARD_DECALREGERROR=		{big}Oups !{/big}{n}Il y a eu une erreur lors de l'application de la propriété{n}{#ff1144}((property)){#} à {#ff1144}((decal)){#}{n}Vous avez peut-être un attribut manquant ou invalide dans votre fichier {#44adf7}DecalRegistry.xml{#}.
-	POSTCARD_MISSINGTUTORIAL=	{big}Oups !{/big}{n}Le tutorial {#ff1144}((tutorial)){#} est introuvable.{n}Vérifiez le fichier {#44adf7}log.txt{#} pour plus d'informations.
-	POSTCARD_TILEXMLERROR=		{big}Oups !{/big}{n}Une erreur est survenue lors de la lecture d'un tileset dans {#ff1144}((path)){#}.{n}Vérifiez le fichier {#44adf7}log.txt{#} pour plus d'informations.
-	POSTCARD_XMLERROR=			{big}Oups !{/big}{n}Il y a une erreur de syntaxe dans {#ff1144}((path)){#}.{n}Vérifiez le fichier {#44adf7}log.txt{#} pour plus d'informations.
-	POSTCARD_BOSSLASTNODEHIT=	{big}Oups !{/big}{n}Le dernier noeud de l'entité {#ff1144}Badeline Boss{#} a été touché, veuillez ajouter un autre noeud en-dehors de la salle de façon à ce que le joueur ne puisse pas l'atteindre.
-	POSTCARD_LEVELNOROOMS=		{big}Oups !{/big}{n}Cette map n'a {#f94a4a}aucune salle{#} !{n}Assurez-vous que cette map comporte {n}{#44adf7}au moins une salle{#}, et que{n}vous avez sauvegardé la map après sa création.
+	POSTCARD_LEVELGONE= 		{big}Merci ((player)) !{/big}{n}Mais {#ff1144}((sid)){#} est dans une autre montagne.{n}{n}(Cette map n'existe plus.)
+	POSTCARD_LEVELLOADFAILED= 	{big}Désolé !{/big}{n}Mais {#ff1144}((sid)){#}{n}n'a pas pu être chargé.{n}Envoie ton {#44adf7}log.txt{#}{n}au créateur de la map.
+	POSTCARD_LEVELNOSPAWN= 		{big}Oups !{/big}{n}Cette map n'a pas{n}de {#44adf7}point de départ !{#}{n}Vérifie que la map{n}contient une entité {#44adf7}Player{#}.
+	POSTCARD_BADTILEID=			{big}Oups !{/big}{n}Une ((type))tile inexistante dont l'id est {#ff1144}((id)){#} est présente à la position{n}{#ff1144}(((x)), ((y))){#} dans la salle {#ff1144}((room)){#}.{n}Ouvre le fichier {#44adf7}log.txt{#} pour plus d'informations.
+	POSTCARD_DECALREGERROR=		{big}Oups !{/big}{n}Il y a eu une erreur lors de l'application de la propriété{n}{#ff1144}((property)){#} à {#ff1144}((decal)){#}{n}Il y a peut-être un attribut manquant ou invalide dans ton fichier {#44adf7}DecalRegistry.xml{#}.
+	POSTCARD_MISSINGTUTORIAL=	{big}Oups !{/big}{n}Le tutorial {#ff1144}((tutorial)){#} est introuvable.{n}Ouvre le fichier {#44adf7}log.txt{#} pour plus d'informations.
+	POSTCARD_TILEXMLERROR=		{big}Oups !{/big}{n}Une erreur est survenue lors de la lecture d'un tileset dans {#ff1144}((path)){#}.{n}Ouvre le fichier {#44adf7}log.txt{#} pour plus d'informations.
+	POSTCARD_XMLERROR=			{big}Oups !{/big}{n}Il y a une erreur de syntaxe dans {#ff1144}((path)){#}.{n}Ouvre le fichier {#44adf7}log.txt{#} pour plus d'informations.
+	POSTCARD_BOSSLASTNODEHIT=	{big}Oups !{/big}{n}Le dernier noeud de l'entité {#ff1144}Badeline Boss{#} a été touché, tu dois ajouter un autre noeud en-dehors de la salle pour que Madeline ne puisse pas l'atteindre.
+	POSTCARD_LEVELNOROOMS=		{big}Oups !{/big}{n}Cette map n'a {#f94a4a}aucune salle{#} !{n}Vérifie que cette map contient {n}{#44adf7}au moins une salle{#}, et que{n}tu as bien sauvegardé la map.
 
 # Main Menu
-	MENU_TITLETOUCH= 		TOUCH
+	MENU_TITLETOUCH= 		TACTILE
 	MENU_MAPLIST= 			Liste des maps
 	MENU_MODOPTIONS= 		Options des mods
 	MENU_PAUSE_MODOPTIONS= 	Options des mods
@@ -27,12 +27,12 @@
 	MENU_MODOPTIONS_MOD_UPDATES_AVAILABLE=		Mises à jour disponibles pour {0} mods
 	
 # Title Screen
-	MENU_TITLESCREEN_RESTART_VANILLA= Lancement du jeu non modifié
+	MENU_TITLESCREEN_RESTART_VANILLA= Lancement de Celeste non moddé
 	MENU_TITLESCREEN_RESTART_VANILLA_SAVES_WARN= ATTENTION : En raison de limitations imposées par l'OS, les sauvegardes ne sont pas partagées !
 
 # Extra Key Mapping
-	KEY_CONFIG_ADDING= APPUYEZ SUR LA TOUCHE SUPPLÉMENTAIRE POUR
-	KEY_CONFIG_ADDITION_HINT= Utilisez Shift + Confirmer pour ajouter des touches
+	KEY_CONFIG_ADDING= APPUIE SUR LA TOUCHE SUPPLÉMENTAIRE POUR
+	KEY_CONFIG_ADDITION_HINT= Utilise Shift + Confirmer pour ajouter des touches
 
 # Mod Options
 	MODOPTIONS_TITLE= 										EVEREST
@@ -46,10 +46,10 @@
 	MODOPTIONS_COREMODULE_VERSIONLIST= 						Changer de version d'Everest
 	MODOPTIONS_COREMODULE_TITLE= 							Everest Core
 	MODOPTIONS_COREMODULE_DEBUGMODE= 						Mode debug
-	MODOPTIONS_COREMODULE_LAUNCHWITHFMODLIVEUPDATE= 		Relancer avec FMOD Live Update
-	MODOPTIONS_COREMODULE_LAUNCHWITHOUTINTRO= 				Relancer sans intro
+	MODOPTIONS_COREMODULE_LAUNCHWITHFMODLIVEUPDATE= 		Activer FMOD Live Update
+	MODOPTIONS_COREMODULE_LAUNCHWITHOUTINTRO= 				Passer l'intro au lancement
 	MODOPTIONS_COREMODULE_SHOWMODOPTIONSINGAME=				"Options des mods" dans le menu Pause
-	MODOPTIONS_COREMODULE_SHOWEVERESTTITLESCREEN=			Utiliser l'écran titre Everest
+	MODOPTIONS_COREMODULE_SHOWEVERESTTITLESCREEN=			Écran titre Everest
 	MODOPTIONS_COREMODULE_INPUTGUI= 						Images des boutons
 	MODOPTIONS_COREMODULE_INPUTGUI_= 						AUTO
 	MODOPTIONS_COREMODULE_INPUTGUI_KEYBOARD= 				CLAVIER
@@ -58,7 +58,7 @@
 	MODOPTIONS_COREMODULE_INPUTGUI_NS_RIGHTJOYCON= 			SWITCH R
 	MODOPTIONS_COREMODULE_INPUTGUI_PS4= 					PS4
 	MODOPTIONS_COREMODULE_INPUTGUI_XB1= 					XBONE
-	MODOPTIONS_COREMODULE_INPUTGUI_TOUCH= 					TOUCH
+	MODOPTIONS_COREMODULE_INPUTGUI_TOUCH= 					TACTILE
 	MODOPTIONS_COREMODULE_MAINMENUMODE= 					Disposition du menu principal
 	MODOPTIONS_COREMODULE_COMPATMODE=						Mode de compatibilité
 	MODOPTIONS_COREMODULE_COMPATMODE_NONE=					AUCUN
@@ -66,17 +66,17 @@
 	MODOPTIONS_COREMODULE_COMPATMODE_NONE_DESCR_B=
 	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYXNA=				LEGACY XNA
 	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYXNA_DESCR_A=		Reproduit le bug des 61 FPS présent sous XNA
-	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYXNA_DESCR_B=		A ACTIVER UNIQUEMENT SI VOUS ETES AFFECTE PAR CE PROBLEME !
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYXNA_DESCR_B=		À ACTIVER UNIQUEMENT SI TU ES AFFECTÉ PAR CE PROBLÈME !
 	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYFNA=				LEGACY FNA
 	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYFNA_DESCR_A=		Reproduit la latence sur les contrôles présente sur FNA
-	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYFNA_DESCR_B=		A ACTIVER UNIQUEMENT SI VOUS AVEZ L'HABITUDE DE CETTE LATENCE !
+	MODOPTIONS_COREMODULE_COMPATMODE_LEGACYFNA_DESCR_B=		À ACTIVER UNIQUEMENT SI TU AS L'HABITUDE DE CETTE LATENCE !
 	MODOPTIONS_COREMODULE_D3D11EXCLUSIVEFULLSCREEN=			Mode plein écran exclusif 
 	MODOPTIONS_COREMODULE_D3D11EXCLUSIVEFULLSCREEN_DESC=	Affecte le rendu D3D11 sous Windows
-	MODOPTIONS_COREMODULE_COMPATMODE_INCOMPATIBLE=			Attention : Ce mode est incompatible avec votre installation non modifiée !
+	MODOPTIONS_COREMODULE_COMPATMODE_INCOMPATIBLE=			Attention : Ce mode est incompatible avec ton installation non moddée !
 	MODOPTIONS_COREMODULE_AUTOUPDATEMODSONSTARTUP=			Mettre à jour les mods au démarrage
 	MODOPTIONS_COREMODULE_MAINMENUMODE_= 					DÉFAUT
 	MODOPTIONS_COREMODULE_MAINMENUMODE_ROWS= 				LIGNES
-	MODOPTIONS_COREMODULE_MAINMENUMODE_TOUCH= 				TOUCH
+	MODOPTIONS_COREMODULE_MAINMENUMODE_TOUCH= 				TACTILE
 	MODOPTIONS_COREMODULE_MODUPDATES= 						Mises à jour des mods
 	MODOPTIONS_COREMODULE_USEKEYBOARDFORTEXTINPUT=			Utiliser le clavier pour saisir du texte
 	MODOPTIONS_COREMODULE_WARNONEVERESTYAMLERRORS=			Avertir en cas d'erreur sur everest.yaml
@@ -90,7 +90,7 @@
 	MODOPTIONS_COREMODULE_TOGGLEDEBUGCONSOLE=				Ouvrir/Fermer la console de debug
 	MODOPTIONS_COREMODULE_DEBUGCONSOLE=						Ouvrir la console de debug
 	MODOPTIONS_COREMODULE_DEBUGMAP=							Ouvrir la carte de debug
-	MODOPTIONS_COREMODULE_MOUNTAINCAM_SUBHEADER=			CAMERA DANS LE MENU PRINCIPAL
+	MODOPTIONS_COREMODULE_MOUNTAINCAM_SUBHEADER=			CAMÉRA DANS LE MENU PRINCIPAL
 	MODOPTIONS_COREMODULE_CAMERAFORWARD=					Avancer
 	MODOPTIONS_COREMODULE_CAMERABACKWARD=					Reculer
 	MODOPTIONS_COREMODULE_CAMERARIGHT=						Droite
@@ -98,11 +98,11 @@
 	MODOPTIONS_COREMODULE_CAMERAUP=							Haut
 	MODOPTIONS_COREMODULE_CAMERADOWN=						Bas
 	MODOPTIONS_COREMODULE_CAMERASLOW=						Ralentir
-	MODOPTIONS_COREMODULE_CAMERAPRINT=						Ecrire la position dans les logs
+	MODOPTIONS_COREMODULE_CAMERAPRINT=						Écrire la position dans log.txt
 	MODOPTIONS_COREMODULE_TOGGLEMOUNTAINFREECAM=			Activer la Free Cam
 
 	MODOPTIONS_COREMODULE_SOUNDTEST= 						Test sons
-	MODOPTIONS_COREMODULE_OOBE= 							Ouvrir l'écran de premier démarrage
+	MODOPTIONS_COREMODULE_OOBE= 							Rejouer l'introduction à Everest
 	MODOPTIONS_COREMODULE_TOGGLEMODS= 						Activer ou désactiver des mods
 
 	MODOPTIONS_COREMODULE_DISCORDRICHPRESENCE=				Discord Rich Presence
@@ -113,21 +113,37 @@
 	MODOPTIONS_COREMODULE_DISCORDSHOWROOM=					Montrer le nom de la salle
 	MODOPTIONS_COREMODULE_DISCORDSHOWBERRIES=				Montrer le nombre de fraises
 	MODOPTIONS_COREMODULE_DISCORDSHOWDEATHS=				Montrer le nombre de morts
-	MODOPTIONS_COREMODULE_DISCORDFAILED=					La connexion à Discord a échoué. Désactiver et réactiver pour réessayer.
+	MODOPTIONS_COREMODULE_DISCORDFAILED=					La connexion à Discord a échoué. Désactive et réactive pour réessayer.
 	
-	MODOPTIONS_COREMODULE_MIRRORPREFERENCES=				Utiliser un miroir par défaut
+	MODOPTIONS_COREMODULE_PSOPTIONS=						Options de photosensibilité Everest
+	MODOPTIONS_COREMODULE_PSOPTIONS_DESC=					Active certaines parties du Mode Photosensible. Ajouté par Everest.
+	MODOPTIONS_COREMODULE_PSDISTORT=						Effets d'anxiété et distorsion
+	MODOPTIONS_COREMODULE_PSDISTORT_DESC=					Contrôle l'effet de distorsion à l'approche d'un "seeker".
+	MODOPTIONS_COREMODULE_PSGLITCH=							Effets "glitch"
+	MODOPTIONS_COREMODULE_PSGLITCH_DESC=					Contrôle l'effet "glitch" de la transition à "Épreuve Horizon" dans le niveau "Adieu".
+	MODOPTIONS_COREMODULE_PSLIGHTNING=						Intérieur des barrières électriques
+	MODOPTIONS_COREMODULE_PSLIGHTNING_DESC=					Contrôle si l'intérieur des barrières électriques du niveau "Adieu" clignote.
+	MODOPTIONS_COREMODULE_PSSCREENFLASH=					Flash de l'écran
+	MODOPTIONS_COREMODULE_PSSCREENFLASH_DESC=				Contrôle si l'écran peut flasher en blanc, par exemple en activant un interrupteur dans "Le cœur".
+	MODOPTIONS_COREMODULE_PSTEXTHIGHLIGHT=					Sélection d'une option
+	MODOPTIONS_COREMODULE_PSTEXTHIGHLIGHT_DESC=				Contrôle si l'option sélectionnée clignote dans les menus.
+	
+	MODOPTIONS_COREMODULE_MIRRORPREFERENCES=				Miroir pour le téléchargement de mods
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_GB=				Désactivé
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_JADE=			Allemagne
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_WEGFAN=			Chine
 	MODOPTIONS_COREMODULE_MIRRORPREFERENCES_OTOBOT=			Amérique du Nord
 
+	MODOPTIONS_COREMODULE_USEAPIMIRROR= 				    Miroir pour la base de données
+	MODOPTIONS_COREMODULE_USEAPIMIRROR_DESC=			    Peut aider en cas d'erreur "Le téléchargement de la base de données a échoué"
+
 	MODOPTIONS_COREMODULE_NOTLOADED_A= 						Certains mods n'ont pas pu être chargés.
-	MODOPTIONS_COREMODULE_NOTLOADED_B= 						Vérifiez votre log.txt pour plus d'informations.
+	MODOPTIONS_COREMODULE_NOTLOADED_B= 						Ouvre le fichier log.txt pour plus d'informations.
 	MODOPTIONS_COREMODULE_NOTLOADED_NOTFOUND=				{0} non trouvé(s)
 	MODOPTIONS_COREMODULE_NOTLOADED_ASMLOADERROR=			échec de chargement de la DLL
 	MODOPTIONS_COREMODULE_YAMLERRORS= 						Certains fichiers everest.yaml n'ont pas pu être chargés.
 
-	MODOPTIONS_COREMODULE_SEARCHBOX_PLACEHOLDER=			Appuyez sur Tab ou Entrée pour lancer la recherche
+	MODOPTIONS_COREMODULE_SEARCHBOX_PLACEHOLDER=			Appuie sur Tab ou Entrée pour lancer la recherche
 
 	MODOPTIONS_VANILLATRISTATE_NEVER=						DÉSACTIVÉ
 	MODOPTIONS_VANILLATRISTATE_EVEREST=						EVEREST
@@ -154,7 +170,9 @@
 	MAPLIST_RESULTS_PLURAL=   {0} résultats trouvés
 
 	LEVELSET_CELESTE= 		Celeste
-	LEVELSET_= 				Non-catégorisé
+	LEVELSET_= 				Sans catégorie
+
+	MISSING_VANILLA_DATA= Données manquantes :(
 
 # Updater
 	UPDATER_TITLE= 					MISE À JOUR
@@ -199,10 +217,9 @@
 	EVERESTUPDATER_WAITFORINSTALLER=	Installation en cours...
 	EVERESTUPDATER_INSTALLERFAILED=	L'installation a échoué ! Code de retour : {0}
 	EVERESTUPDATER_STARTINGFAILED=	Le lancement de l'installateur a échoué.
-	EVERESTUPDATER_ERRORHINT1=		Merci de créer une "issue" sur GitHub @ https://github.com/EverestAPI/Everest
+	EVERESTUPDATER_ERRORHINT1=		Merci de créer une "issue" sur GitHub : https://github.com/EverestAPI/Everest
 	EVERESTUPDATER_ERRORHINT2=		ou de rejoindre le salon #modding_help sur Discord (invitation sur le dépôt GitHub),
-	EVERESTUPDATER_ERRORHINT3=		et envoyez votre log.txt.
-
+	EVERESTUPDATER_ERRORHINT3=		et attache ton log.txt à ton rapport.
 # Mod Updater
 	MODUPDATECHECKER_MENU_TITLE=	MISE À JOUR DES MODS
 	MODUPDATECHECKER_NOUPDATE=		Aucune mise à jour disponible
@@ -215,12 +232,12 @@
 	MODUPDATECHECKER_FAILED=		échec de mise à jour
 	MODUPDATECHECKER_CANCELLING=	annulation de la mise à jour...
 	MODUPDATECHECKER_CANCELLED=		mise à jour annulée
-	MODUPDATECHECKER_WILLRESTART=	appuyez sur Retour pour redémarrer Celeste
+	MODUPDATECHECKER_WILLRESTART=	appuie sur Retour pour redémarrer Celeste
 	MODUPDATECHECKER_UPDATE_ALL=	Mettre à jour tous les mods
 	MODUPDATECHECKER_UPDATE_ALL_INPROGRESS=	Mise à jour des mods en cours...
 	MODUPDATECHECKER_UPDATE_ALL_DONE=	Tous les mods ont été mis à jour.
 	MODUPDATECHECKER_RESTARTNEEDED= Celeste doit redémarrer pour continuer
-	MODUPDATECHECKER_MENU_HEADER_RESTART= Choisissez une action
+	MODUPDATECHECKER_MENU_HEADER_RESTART= Choisis une action
 	MODUPDATECHECKER_SHUTDOWN= Fermer
 	MODUPDATECHECKER_RESTART= Redémarrer
 
@@ -230,9 +247,9 @@
 	AUTOUPDATECHECKER_DOWNLOADING=	Téléchargement
 	AUTOUPDATECHECKER_VERIFYING=	Vérification
 	AUTOUPDATECHECKER_INSTALLING=	Installation
-	AUTOUPDATECHECKER_FAILED=		Certaines mises à jour ont échoué. Vérifiez votre log.txt pour plus d'infos.
-	AUTOUPDATECHECKER_CONTINUE=		Appuyez sur Confirmer pour continuer
-	AUTOUPDATECHECKER_REBOOT=		Appuyez sur Confirmer pour redémarrer Celeste
+	AUTOUPDATECHECKER_FAILED=		Certaines mises à jour ont échoué. Ouvre le fichier log.txt pour plus d'infos.
+	AUTOUPDATECHECKER_CONTINUE=		Appuie sur Confirmer pour continuer
+	AUTOUPDATECHECKER_REBOOT=		Appuie sur Confirmer pour redémarrer Celeste
 	AUTOUPDATECHECKER_SKIP=			Passer
 	AUTOUPDATECHECKER_SKIPPING=		Annulation de la mise à jour...
 	
@@ -241,27 +258,27 @@
 	DEPENDENCYDOWNLOADER_DOWNLOADING_DATABASE=		Téléchargement de la base de données de mods...
 	DEPENDENCYDOWNLOADER_LOADING_INSTALLED_MODS=	Chargement des informations sur les mods installés...
 	DEPENDENCYDOWNLOADER_DONE=						terminé.
-	DEPENDENCYDOWNLOADER_DOWNLOAD_DATABASE_FAILED=	ERREUR: Le téléchargement de la base de données a échoué. Vérifiez votre log.txt pour plus d'informations.
-	DEPENDENCYDOWNLOADER_MUST_UPDATE_EVEREST=		ATTENTION: Certains de vos mods demandent une version plus récente d'Everest. Installez-la depuis le menu "Changer de version d'Everest".
-	DEPENDENCYDOWNLOADER_EVEREST_UPDATE=			Everest va être mis à jour vers la version {0} pour que certains mods puissent fonctionner. Appuyez sur Confirmer pour continuer.
-	DEPENDENCYDOWNLOADER_UPDATE_CELESTE=			ERREUR: Certains de vos mods ont besoin d'une version plus récente de Celeste pour fonctionner. Merci de mettre à jour votre jeu.
-	DEPENDENCYDOWNLOADER_MOD_NOT_FOUND=				ERREUR: {0} n'a pas été trouvé dans la base de données. Merci de l'installer manuellement.
-	DEPENDENCYDOWNLOADER_MOD_NOT_AUTO_INSTALLABLE=	ERREUR: {0} possède plusieurs versions et ne peut pas être installé automatiquement. Merci de l'installer manuellement.
-	DEPENDENCYDOWNLOADER_MOD_WRONG_VERSION=			ERREUR: La version {1} de {0} est nécessaire, mais seule la version {2} est disponible. Merci d'installer ce mod manuellement.
+	DEPENDENCYDOWNLOADER_DOWNLOAD_DATABASE_FAILED=	ERREUR : Le téléchargement de la base de données a échoué. Ouvre le fichier log.txt pour plus d'informations.
+	DEPENDENCYDOWNLOADER_MUST_UPDATE_EVEREST=		ATTENTION : Certains mods installés ont besoin d'une version plus récente d'Everest. Installe-la depuis le menu "Changer de version d'Everest".
+	DEPENDENCYDOWNLOADER_EVEREST_UPDATE=			Everest va être mis à jour vers la version {0} pour que certains mods puissent fonctionner. Appuie sur Confirmer pour continuer.
+	DEPENDENCYDOWNLOADER_UPDATE_CELESTE=			ERREUR : Certains mods installés ont besoin d'une version plus récente de Celeste pour fonctionner. Mets à jour ton jeu avant de continuer.
+	DEPENDENCYDOWNLOADER_MOD_NOT_FOUND=				ERREUR : {0} n'a pas été trouvé dans la base de données. Installe-le manuellement.
+	DEPENDENCYDOWNLOADER_MOD_NOT_AUTO_INSTALLABLE=	ERREUR : {0} possède plusieurs versions et ne peut pas être installé automatiquement. Installe-le manuellement.
+	DEPENDENCYDOWNLOADER_MOD_WRONG_VERSION=			ERREUR : La version {1} de {0} est nécessaire, mais seule la version {2} est disponible. Installe la version correcte manuellement.
 	DEPENDENCYDOWNLOADER_RESTARTING=				Redémarrage en cours
 	DEPENDENCYDOWNLOADER_RESTARTING_IN=				Redémarrage dans {0}
-	DEPENDENCYDOWNLOADER_PRESS_BACK_TO_RESTART=		Appuyez sur Retour pour redémarrer Celeste.
-	DEPENDENCYDOWNLOADER_PRESS_BACK_TO_GO_BACK=		Appuyez sur Retour pour revenir aux options des mods.
+	DEPENDENCYDOWNLOADER_PRESS_BACK_TO_RESTART=		Appuie sur Retour pour redémarrer Celeste.
+	DEPENDENCYDOWNLOADER_PRESS_BACK_TO_GO_BACK=		Appuie sur Retour pour revenir aux options des mods.
 	DEPENDENCYDOWNLOADER_DOWNLOADING=				Téléchargement de {0} depuis {1}...
 	DEPENDENCYDOWNLOADER_DOWNLOADING_MIRROR=		Le téléchargement a échoué, tentative à partir du miroir {0}...
 	DEPENDENCYDOWNLOADER_DOWNLOAD_FINISHED=			Téléchargement terminé.
 	DEPENDENCYDOWNLOADER_VERIFYING_CHECKSUM=		Vérification de la somme de contrôle...
 	DEPENDENCYDOWNLOADER_UPDATING=					Installation de la mise à jour de {0} ({1} -> {2}) vers {3}...
 	DEPENDENCYDOWNLOADER_INSTALLING=				Installation du mod {0} v.{1} vers {2}...
-	DEPENDENCYDOWNLOADER_INSTALL_FAILED=			ERREUR: L'installation de {0} a échoué. Vérifiez votre log.txt pour plus d'informations.
-	DEPENDENCYDOWNLOADER_HOTLOAD_FAILED=			ATTENTION: Le chargement de {0} a échoué. Le jeu devra redémarrer.
+	DEPENDENCYDOWNLOADER_INSTALL_FAILED=			ERREUR: L'installation de {0} a échoué. Ouvre le fichier log.txt pour plus d'informations.
+	DEPENDENCYDOWNLOADER_HOTLOAD_FAILED=			ATTENTION : Le chargement de {0} a échoué. Le jeu devra redémarrer.
 	DEPENDENCYDOWNLOADER_MOD_UNBLACKLIST=			Suppression du mod {0} de la blacklist...
-	DEPENDENCYDOWNLOADER_UNBLACKLIST_FAILED=		La suppression de certains mods de la blacklist a échoué. Vérifiez votre log.txt pour plus d'informations.
+	DEPENDENCYDOWNLOADER_UNBLACKLIST_FAILED=		La suppression de certains mods de la blacklist a échoué. Ouvre le fichier log.txt pour plus d'informations.
 	DEPENDENCYDOWNLOADER_LOADING_MOD=				Chargement de {0} depuis {1}...
 	DEPENDENCYDOWNLOADER_LOADING_MOD_NOMETA=		Chargement d'un mod depuis {0}...
 
@@ -284,21 +301,21 @@
 	MODOPTIONS_MODTOGGLE=				(DÉS)ACTIVER DES MODS
 	MODOPTIONS_MODTOGGLE_LOADING=		Chargement des informations sur les mods...
 	MODOPTIONS_MODTOGGLE_TOGGLEDEPS=	(Dés)activer les dépendances automatiquement
-	MODOPTIONS_MODTOGGLE_TOGGLEDEPS_MESSAGE1=	Si vous activez un mod, toutes ses dépendances seront également activées.
-	MODOPTIONS_MODTOGGLE_TOGGLEDEPS_MESSAGE2=	Si vous désactivez un mod, tous les mods qui l'utilisent comme dépendance seront désactivés.
+	MODOPTIONS_MODTOGGLE_TOGGLEDEPS_MESSAGE1=	Si tu actives un mod, tous les mods dont il a besoin seront également activés.
+	MODOPTIONS_MODTOGGLE_TOGGLEDEPS_MESSAGE2=	Si tu désactives un mod, tous les mods qui en ont besoin seront également désactivés.
 	MODOPTIONS_MODTOGGLE_PROTECTFAVORITES=			Protéger les mods favoris
-	MODOPTIONS_MODTOGGLE_PROTECTFAVORITES_MESSAGE=	Appuyez sur {0} pour ajouter/supprimer des mods de la liste des favoris.
-	MODOPTIONS_MODTOGGLE_MESSAGE_1=		Si vous activez ou désactivez des mods, votre blacklist.txt sera remplacé,
+	MODOPTIONS_MODTOGGLE_PROTECTFAVORITES_MESSAGE=	Appuie sur {0} pour ajouter/supprimer des mods de la liste des favoris.
+	MODOPTIONS_MODTOGGLE_MESSAGE_1=		Si tu actives ou désactives des mods, ton blacklist.txt sera remplacé,
 	MODOPTIONS_MODTOGGLE_MESSAGE_2=		et Celeste va redémarrer pour appliquer les changements.
 	MODOPTIONS_MODTOGGLE_MESSAGE_3=		Les mods mis en surbrillance sont utilisés par d'autres mods activés comme des dépendances.
-	MODOPTIONS_MODTOGGLE_WHITELISTWARN= Désactivez votre whitelist pour que ces réglages soient appliqués correctement.
+	MODOPTIONS_MODTOGGLE_WHITELISTWARN= Désactive ta whitelist pour que ces réglages soient appliqués correctement.
 	MODOPTIONS_MODTOGGLE_ENABLEALL=		Tout activer
 	MODOPTIONS_MODTOGGLE_DISABLEALL=	Tout désactiver
 	MODOPTIONS_MODTOGGLE_CANCEL=		Annuler
 	MODOPTIONS_MODTOGGLE_ZIPS=			Fichiers ZIP
 	MODOPTIONS_MODTOGGLE_DIRECTORIES=	Dossiers
 	MODOPTIONS_MODTOGGLE_BINS=			Fichiers .bin de maps
-	MODOPTIONS_MODTOGGLE_SEARCHBOX_PLACEHOLDER=		Appuyez sur Tab ou Entrée pour lancer la recherche
+	MODOPTIONS_MODTOGGLE_SEARCHBOX_PLACEHOLDER=		Appuie sur Tab ou Entrée pour lancer la recherche
 
 # Asset Reload Helper
 	ASSETRELOADHELPER_RELOADINGMAP=			Rechargement de la map...
