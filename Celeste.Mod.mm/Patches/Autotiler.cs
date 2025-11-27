@@ -491,6 +491,11 @@ namespace Celeste {
 }
 
 namespace MonoMod {
+
+    /// <summary>
+    ///   Patches the <see cref="Celeste.Autotiler"/> constructor to explicitly throw
+    ///   an error when encountering a duplicate tileset ID.
+    /// </summary>
     [MonoModCustomMethodAttribute(nameof(MonoModRules.PatchAutotilerCtor))]
     class PatchAutotilerCtorAttribute : Attribute { }
 
@@ -498,12 +503,16 @@ namespace MonoMod {
         public static void PatchAutotilerCtor(ILContext context, CustomAttribute attrib) {
             ILCursor cursor = new(context);
 
+            // insert a call to ThrowOnDuplicateId right after reading the tileset ID from the XML
             MethodDefinition m_throwOnDuplicateId = context.Method.DeclaringType.FindMethod("System.Void ThrowOnDuplicateId(System.Char,System.String)")!;
 
+            // char c = item.AttrChar("id");
+            //+ThrowOnDuplicateId(c, filename);
+
             cursor.GotoNext(MoveType.After, static instr => instr.MatchStloc3());
-            cursor.EmitLdarg0();
-            cursor.EmitLdloc3();
-            cursor.EmitLdarg1();
+            cursor.EmitLdarg0(); // this (Autotiler instance)
+            cursor.EmitLdloc3(); // char c (the tileset id)
+            cursor.EmitLdarg1(); // string filename (the xml path)
             cursor.EmitCallvirt(m_throwOnDuplicateId);
         }
     }
