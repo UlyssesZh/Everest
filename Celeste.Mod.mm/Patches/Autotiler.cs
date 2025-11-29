@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0626 // Method, operator, or accessor is marked external and has no attributes on it
+#pragma warning disable CS0626 // Method, operator, or accessor is marked external and has no attributes on it
 #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
 
 using Celeste.Mod;
@@ -413,7 +413,7 @@ namespace Celeste {
             return !string.IsNullOrEmpty(sfxEvent = lookup.TryGetValue(tiletype, out patch_TerrainType t) ? t.DebrisImpactSfx : "");
         }
 
-        public void ThrowOnDuplicateId(char id, string xmlName) {
+        private void ThrowOnDuplicateId(char id, string xmlName) {
             if (!lookup.ContainsKey(id))
                 return;
 
