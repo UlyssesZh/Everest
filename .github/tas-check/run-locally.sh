@@ -16,8 +16,8 @@ case "$1" in
         ;;
 
     "StrawberryJam2021")
-        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/065ead6d933c0c49e22dd17400293b75035c67ca.zip"
-        TAS_PATH="StrawberryJamTAS-065ead6d933c0c49e22dd17400293b75035c67ca/0-SJ All Levels.tas"
+        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/c99c0bc38afc86131030c35c5e0cf024fdda0587.zip"
+        TAS_PATH="StrawberryJamTAS-c99c0bc38afc86131030c35c5e0cf024fdda0587/0-SJ All Levels.tas"
         BUNDLE_DOWNLOAD="https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-00ddb83f.zip"
         ;;
 
