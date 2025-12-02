@@ -446,7 +446,7 @@ namespace Celeste {
             /// <inheritdoc cref="TextMenu.Current"/>
             public TextMenu.Item Current {
                 get {
-                    if (Items.Count <= 0 || Selection < 0) {
+                    if (Items.Count <= 0 || Selection < 0 || Selection >= Items.Count) {
                         return null;
                     }
                     return Items[Selection];
@@ -485,7 +485,9 @@ namespace Celeste {
                 get {
                     float min = Engine.Height - 150f - Container.Height * Container.Justify.Y;
                     float max = 150f + Container.Height * Container.Justify.Y;
-                    return Calc.Clamp((Engine.Height / 2) + Container.Height * Container.Justify.Y - GetYOffsetOf(Current), min, max);
+
+                    float y_offset = Current is not null ? GetYOffsetOf(Current) : GetYOffsetOf(Items[Calc.Clamp(Selection, 0, Items.Count-1)]);
+                    return Calc.Clamp((Engine.Height / 2) + Container.Height * Container.Justify.Y - y_offset, min, max);
                 }
             }
 
@@ -507,6 +509,7 @@ namespace Celeste {
             public bool Focused;
 
             private bool enterOnSelect;
+            private bool entering;
             private float ease;
 
             private bool containerAutoScroll;
@@ -558,9 +561,6 @@ namespace Celeste {
                     Container.Add(item.ValueWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     Container.Add(item.SelectWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     item.ValueWiggler.UseRawDeltaTime = (item.SelectWiggler.UseRawDeltaTime = true);
-                    if (Selection == -1) {
-                        FirstSelection();
-                    }
                     RecalculateSize();
                     item.Added();
                     return this;
@@ -583,9 +583,6 @@ namespace Celeste {
                     Container.Add(item.ValueWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     Container.Add(item.SelectWiggler = Wiggler.Create(0.25f, 3f, null, false, false));
                     item.ValueWiggler.UseRawDeltaTime = (item.SelectWiggler.UseRawDeltaTime = true);
-                    if (Selection == -1) {
-                        FirstSelection();
-                    }
                     RecalculateSize();
                     item.Added();
                     return this;
@@ -646,8 +643,8 @@ namespace Celeste {
             /// Set the selection to the last possible <see cref="TextMenu.Item"/>.
             /// </summary>
             public void LastSelection() {
-                Selection = LastPossibleSelection;
-                MoveSelection(0, false);
+                Selection = Items.Count;
+                MoveSelection(-1, false);
             }
 
             /// <inheritdoc cref="TextMenu.MoveSelection(int, bool)"/>
@@ -661,7 +658,7 @@ namespace Celeste {
                 }
                 do {
                     Selection += direction;
-                    if (enterOnSelect) {
+                    if (enterOnSelect && !entering) {
                         if (Selection < 0 || Selection >= Items.Count) {
                             // Avoid crash when getting Current item
                             Selection = selection;
@@ -687,7 +684,7 @@ namespace Celeste {
                     Selection = selection;
                 }
                 if (Selection != selection && Current != null) {
-                    if (selection >= 0 && Items[selection] != null && Items[selection].OnLeave != null) {
+                    if (selection >= 0 && selection < Items.Count && Items[selection] != null && Items[selection].OnLeave != null) {
                         Items[selection].OnLeave();
                     }
                     Current.OnEnter?.Invoke();
@@ -763,12 +760,16 @@ namespace Celeste {
                 if (Items.Count > 0) {
                     Container.Focused = false;
                     Focused = true;
+                    containerAutoScroll = Container.AutoScroll;
+                    Container.AutoScroll = false;
+
+                    entering = true;
                     if (Input.MenuUp.Pressed)
                         LastSelection();
                     else
                         FirstSelection();
-                    containerAutoScroll = Container.AutoScroll;
-                    Container.AutoScroll = false;
+                    entering = false;
+
                     if (!Input.MenuUp.Repeating && !Input.MenuDown.Repeating)
                         Audio.Play(ConfirmSfx);
                     base.ConfirmPressed();
