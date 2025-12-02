@@ -12,6 +12,18 @@ namespace Celeste {
         [MonoModIgnore]
         [PatchSolidAwake]
         public extern void Awake(Scene scene);
+        
+        [MonoModIgnore]
+        [ForceNoInlining]
+        public extern bool HasPlayerClimbing();
+        
+        [MonoModIgnore]
+        [ForceNoInlining]
+        public extern bool HasPlayerOnTop();
+        
+        [MonoModIgnore]
+        [ForceNoInlining]
+        public extern bool HasPlayerRider();
     }
 }
 
