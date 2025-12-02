@@ -1,11 +1,13 @@
-﻿#pragma warning disable CS0626 // Method, operator, or accessor is marked external and has no attributes on it
+#pragma warning disable CS0626 // Method, operator, or accessor is marked external and has no attributes on it
 #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
 
 using Celeste.Mod;
-using Celeste.Mod.Helpers;
 using Microsoft.Xna.Framework;
+using Mono.Cecil;
 using Monocle;
 using MonoMod;
+using MonoMod.Cil;
+using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -19,6 +21,11 @@ namespace Celeste {
             : base(filename) {
             // no-op. MonoMod ignores this - we only need this to make the compiler shut up.
         }
+
+        [MonoModConstructor]
+        [MonoModIgnore]
+        [PatchAutotilerCtor]
+        public extern void ctor(string filename);
 
         public extern Generated orig_GenerateOverlay(char id, int x, int y, int tilesX, int tilesY, VirtualMap<char> mapData);
         public new Generated GenerateOverlay(char id, int x, int y, int tilesX, int tilesY, VirtualMap<char> mapData) {
@@ -406,6 +413,22 @@ namespace Celeste {
             return !string.IsNullOrEmpty(sfxEvent = lookup.TryGetValue(tiletype, out patch_TerrainType t) ? t.DebrisImpactSfx : "");
         }
 
+        private void ThrowOnDuplicateId(char id, string xmlName) {
+            if (!lookup.ContainsKey(id))
+                return;
+
+            string idString = id.ToString();
+            string idHex = ((ushort) id).ToString("X4");
+            if (Dialog.Languages is not null)
+                // we can throw too early, check if dialogue is loaded first
+                patch_LevelEnter.ErrorMessage = Dialog.Get("POSTCARD_DUPLICATETILEID")
+                    .Replace("((tilechar))", idString)
+                    .Replace("((tilehex))", idHex)
+                    .Replace("((filename))", xmlName.Replace('\\', '/'));
+
+            throw new InvalidOperationException($"Duplicate tileset ID '{idString}' (U+{idHex}) found in {xmlName}.");
+        }
+
         // Required because TerrainType is private.
         private class patch_TerrainType {
             public char ID;
@@ -464,5 +487,33 @@ namespace Celeste {
 
         }
 
+    }
+}
+
+namespace MonoMod {
+
+    /// <summary>
+    ///   Patches the <see cref="Celeste.Autotiler"/> constructor to explicitly throw
+    ///   an error when encountering a duplicate tileset ID.
+    /// </summary>
+    [MonoModCustomMethodAttribute(nameof(MonoModRules.PatchAutotilerCtor))]
+    class PatchAutotilerCtorAttribute : Attribute { }
+
+    static partial class MonoModRules {
+        public static void PatchAutotilerCtor(ILContext context, CustomAttribute attrib) {
+            ILCursor cursor = new(context);
+
+            // insert a call to ThrowOnDuplicateId right after reading the tileset ID from the XML
+            MethodDefinition m_throwOnDuplicateId = context.Method.DeclaringType.FindMethod("System.Void ThrowOnDuplicateId(System.Char,System.String)")!;
+
+            // char c = item.AttrChar("id");
+            //+ThrowOnDuplicateId(c, filename);
+
+            cursor.GotoNext(MoveType.After, static instr => instr.MatchStloc3());
+            cursor.EmitLdarg0(); // this (Autotiler instance)
+            cursor.EmitLdloc3(); // char c (the tileset id)
+            cursor.EmitLdarg1(); // string filename (the xml path)
+            cursor.EmitCallvirt(m_throwOnDuplicateId);
+        }
     }
 }
