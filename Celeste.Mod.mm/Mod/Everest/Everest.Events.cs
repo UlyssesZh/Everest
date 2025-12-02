@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using _Decal = Celeste.Decal;
 using _EventTrigger = Celeste.EventTrigger;
+using _LevelEnter = Celeste.LevelEnter;
 using _LevelLoader = Celeste.LevelLoader;
 using _Level = Celeste.Level;
 using _Session = Celeste.Session;
@@ -103,6 +104,27 @@ namespace Celeste.Mod {
                 public static event Action OnLoadThread;
                 internal static void LoadThread()
                     => OnLoadThread?.Invoke();
+            }
+
+            public static class LevelEnter {
+                public delegate Scene CustomVignetteHandler(_Session session, bool fromSaveData);
+                /// <summary>
+                /// Called at the beginning of <see cref="_LevelEnter.PlayCustomVignette()"/>.<br/>
+                /// Invoked when entering a map, before instantiating and setting the next scene.<br/>
+                /// Should return the next scene to set if some conditions are met, or null otherwise.
+                /// </summary>
+                public static event CustomVignetteHandler OnPlayVignette;
+                internal static Scene PlayVignette(_Session session, bool fromSaveData) {
+                    if (OnPlayVignette is null)
+                        return null;
+
+                    foreach (CustomVignetteHandler handler in OnPlayVignette.GetInvocationList()) {
+                        if (handler(session, fromSaveData) is { } nextScene)
+                            return nextScene;
+                    }
+
+                    return null;
+                }
             }
 
             public static class LevelLoader {
