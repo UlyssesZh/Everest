@@ -369,8 +369,8 @@ namespace Celeste.Mod.UI {
                 using (StreamWriter blacklistTxt = File.CreateText(Everest.Loader.PathBlacklist)) {
                     foreach (string line in currentBlacklist) {
                         if (modFilenamesToUnblacklist.Contains(line)) {
-                            // comment this line to unblacklist this mod.
                             LogLine(string.Format(Dialog.Get("DEPENDENCYDOWNLOADER_MOD_UNBLACKLIST"), line));
+                            // comment this line to unblacklist this mod.
                             blacklistTxt.WriteLine("# " + line);
                             modsLeftToUnblacklist.Remove(line);
                             Logger.Verbose("OuiDependencyDownloader", "Commented out line from blacklist.txt: " + line);
