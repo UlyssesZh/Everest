@@ -136,8 +136,8 @@ namespace Celeste.Mod.Helpers {
             if (predicates.Length == 1)
                 return cursor.TryGotoNext(moveType, predicates[0]);
 
-            Logger.Debug(NextBestFitLogID, $"Looking for next best fit in {cursor.Context.Method.FullName}.");
-            Logger.Debug(NextBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
+            Logger.Verbose(NextBestFitLogID, $"Looking for next best fit in {cursor.Context.Method.FullName}.");
+            Logger.Verbose(NextBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
 
             List<(int start, int end)> matchCandidates = new List<(int start, int end)>();
 
@@ -169,7 +169,7 @@ namespace Celeste.Mod.Helpers {
                     int instructionSpread = cursor.Index - beforeMoveIndex;
                     if (instructionSpread > maxInstructionSpread)
                     {
-                        Logger.Debug(NextBestFitLogID,
+                        Logger.Verbose(NextBestFitLogID,
                             $"Matched predicate #0 at index 0x{savedCursorPosition:X4}, but the instruction spread between predicates #{i-1} and #{i} has been exceeded " +
                             $"({instructionSpread} > {maxInstructionSpread}). Continuing search.");
 
@@ -198,7 +198,7 @@ namespace Celeste.Mod.Helpers {
             if (matchCandidates.Count == 0)
             {
                 // no match :c
-                Logger.Debug(NextBestFitLogID, $"Could not find next best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
+                Logger.Verbose(NextBestFitLogID, $"Could not find next best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
                 return false;
             }
 
@@ -226,7 +226,7 @@ namespace Celeste.Mod.Helpers {
                 }
             }
 
-            Logger.Debug(NextBestFitLogID,
+            Logger.Verbose(NextBestFitLogID,
                 $"Selecting next best fit between indices 0x{bestMatch.start:X4} and 0x{bestMatch.end:X4} for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
 
             // some predicates may be using out parameters; invoke the predicates again to make sure
@@ -386,8 +386,8 @@ namespace Celeste.Mod.Helpers {
             if (predicates.Length == 1)
                 return cursor.TryGotoNext(moveType, predicates[0]);
 
-            Logger.Debug(PrevBestFitLogID, $"Looking for previous best fit in {cursor.Context.Method.FullName}.");
-            Logger.Debug(PrevBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
+            Logger.Verbose(PrevBestFitLogID, $"Looking for previous best fit in {cursor.Context.Method.FullName}.");
+            Logger.Verbose(PrevBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
 
             List<(int start, int end)> matchCandidates = new List<(int start, int end)>();
 
@@ -420,7 +420,7 @@ namespace Celeste.Mod.Helpers {
                     int instructionSpread = cursor.Index - beforeMoveIndex;
                     if (instructionSpread > maxInstructionSpread)
                     {
-                        Logger.Debug(PrevBestFitLogID,
+                        Logger.Verbose(PrevBestFitLogID,
                             $"Matched predicate #0 at index 0x{savedCursorPosition:X4}, but the instruction spread between predicates #{i-1} and #{i} has been exceeded " +
                             $"({instructionSpread} > {maxInstructionSpread}). Continuing search.");
 
@@ -448,7 +448,7 @@ namespace Celeste.Mod.Helpers {
             if (matchCandidates.Count == 0)
             {
                 // no match :c
-                Logger.Debug(PrevBestFitLogID, $"Could not find previous best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
+                Logger.Verbose(PrevBestFitLogID, $"Could not find previous best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
                 return false;
             }
 
@@ -476,7 +476,7 @@ namespace Celeste.Mod.Helpers {
                 }
             }
 
-            Logger.Debug(PrevBestFitLogID,
+            Logger.Verbose(PrevBestFitLogID,
                 $"Selecting previous best fit between indices 0x{bestMatch.start:X4} and 0x{bestMatch.end:X4} for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
 
             // some predicates may be using out parameters; invoke them again to make sure
