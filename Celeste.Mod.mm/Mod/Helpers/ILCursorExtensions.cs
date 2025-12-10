@@ -180,7 +180,7 @@ namespace Celeste.Mod.Helpers {
 
                 if (matchFound)
                 {
-                    Logger.Debug(NextBestFitLogID,
+                    Logger.Verbose(NextBestFitLogID,
                         $"Found match between indices 0x{savedCursorPosition:X4} and 0x{cursor.Index:X4}. Continuing search.");
 
                     // remember the start and end indices of the match
@@ -431,7 +431,7 @@ namespace Celeste.Mod.Helpers {
 
                 if (matchFound)
                 {
-                    Logger.Debug(PrevBestFitLogID,
+                    Logger.Verbose(PrevBestFitLogID,
                         $"Found match between indices 0x{savedCursorPosition:X4} and 0x{cursor.Index:X4}. Continuing search.");
 
                     // remember the start and end indices of the match
