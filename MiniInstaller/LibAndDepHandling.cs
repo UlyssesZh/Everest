@@ -106,8 +106,7 @@ public static class LibAndDepHandling {
 
         // Copy our Steamworks.NET.dll
         string steamworksLibDst = Path.Combine(Globals.PathGame, "Steamworks.NET.dll");
-        File.Delete(steamworksLibDst);
-        File.Copy(steamworksLibSrc, steamworksLibDst);
+        File.Copy(steamworksLibSrc, steamworksLibDst, true);
 
         // Delete old libraries
         foreach (string libFile in Globals.WindowsNativeLibFileNames)
@@ -268,6 +267,7 @@ public static class LibAndDepHandling {
                 // Bind Linux apphost
                 Logger.LogLine($"Binding Linux apphost {Path.ChangeExtension(appExe, null)}");
                 HostWriter.CreateAppHost(Path.Combine(hostsDir, "linux"), Path.ChangeExtension(appExe, null), Path.GetRelativePath(Path.GetDirectoryName(appExe), appDll));
+                File.Delete(Globals.PathCelesteExe);
             } break;
             case Globals.InstallPlatform.MacOS: {
                 // Bind OS X apphost
