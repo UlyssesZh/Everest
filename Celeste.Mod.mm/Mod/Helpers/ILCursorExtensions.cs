@@ -136,8 +136,8 @@ namespace Celeste.Mod.Helpers {
             if (predicates.Length == 1)
                 return cursor.TryGotoNext(moveType, predicates[0]);
 
-            Logger.Verbose(NextBestFitLogID, $"Looking for next best fit in {cursor.Context.Method.FullName}.");
-            Logger.Verbose(NextBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
+            Logger.Debug(NextBestFitLogID, $"Looking for next best fit in {cursor.Context.Method.FullName}.");
+            Logger.Debug(NextBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
 
             List<(int start, int end)> matchCandidates = new List<(int start, int end)>();
 
@@ -180,7 +180,7 @@ namespace Celeste.Mod.Helpers {
 
                 if (matchFound)
                 {
-                    Logger.Verbose(NextBestFitLogID,
+                    Logger.Debug(NextBestFitLogID,
                         $"Found match between indices 0x{savedCursorPosition:X4} and 0x{cursor.Index:X4}. Continuing search.");
 
                     // remember the start and end indices of the match
@@ -198,7 +198,7 @@ namespace Celeste.Mod.Helpers {
             if (matchCandidates.Count == 0)
             {
                 // no match :c
-                Logger.Verbose(NextBestFitLogID, $"Could not find next best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
+                Logger.Debug(NextBestFitLogID, $"Could not find next best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
                 return false;
             }
 
@@ -226,7 +226,7 @@ namespace Celeste.Mod.Helpers {
                 }
             }
 
-            Logger.Verbose(NextBestFitLogID,
+            Logger.Debug(NextBestFitLogID,
                 $"Selecting next best fit between indices 0x{bestMatch.start:X4} and 0x{bestMatch.end:X4} for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
 
             // some predicates may be using out parameters; invoke the predicates again to make sure
@@ -386,8 +386,8 @@ namespace Celeste.Mod.Helpers {
             if (predicates.Length == 1)
                 return cursor.TryGotoNext(moveType, predicates[0]);
 
-            Logger.Verbose(PrevBestFitLogID, $"Looking for previous best fit in {cursor.Context.Method.FullName}.");
-            Logger.Verbose(PrevBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
+            Logger.Debug(PrevBestFitLogID, $"Looking for previous best fit in {cursor.Context.Method.FullName}.");
+            Logger.Debug(PrevBestFitLogID, $"{nameof(ILCursor)}#{cursor.GetHashCode():X8} has initial index 0x{cursor.Index:X4}.");
 
             List<(int start, int end)> matchCandidates = new List<(int start, int end)>();
 
@@ -431,7 +431,7 @@ namespace Celeste.Mod.Helpers {
 
                 if (matchFound)
                 {
-                    Logger.Verbose(PrevBestFitLogID,
+                    Logger.Debug(PrevBestFitLogID,
                         $"Found match between indices 0x{savedCursorPosition:X4} and 0x{cursor.Index:X4}. Continuing search.");
 
                     // remember the start and end indices of the match
@@ -448,7 +448,7 @@ namespace Celeste.Mod.Helpers {
             if (matchCandidates.Count == 0)
             {
                 // no match :c
-                Logger.Verbose(PrevBestFitLogID, $"Could not find previous best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
+                Logger.Debug(PrevBestFitLogID, $"Could not find previous best fit for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
                 return false;
             }
 
@@ -476,7 +476,7 @@ namespace Celeste.Mod.Helpers {
                 }
             }
 
-            Logger.Verbose(PrevBestFitLogID,
+            Logger.Debug(PrevBestFitLogID,
                 $"Selecting previous best fit between indices 0x{bestMatch.start:X4} and 0x{bestMatch.end:X4} for cursor {nameof(ILCursor)}#{cursor.GetHashCode():X8}.");
 
             // some predicates may be using out parameters; invoke them again to make sure
