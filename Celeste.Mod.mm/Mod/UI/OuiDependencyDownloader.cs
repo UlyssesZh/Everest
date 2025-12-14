@@ -51,6 +51,20 @@ namespace Celeste.Mod.UI {
             }
         }
 
+        // rip hot loading. this feature caused a lot of problems for people than it was worth convenience-wise.
+        // - virtually no mod expects to be hot loaded in this way, and can likely crash even after the try/catches seen here
+        // - crashes interrupt the download/update process, often making users stuck with a configuration of mods and everest
+        //   that kills the game on bootup until they update from outside the game
+        // - lots of people make #modding_help reports of crashes when downloading dependencies that are fixed by restarting
+        // - the state of the game at the time of hot loading is not the same as the state of the game at the time of a cold boot,
+        //   potentially making mods not fully initialize
+        // - take this scenario: the user has mod A enabled that optionally depends on mod C. the user installs mod B that requires
+        //   C to be present. when downloading dependencies, C will be downloaded and loaded *after* A, even though A optionally depends
+        //   on C and needs to load after C if present. this can cause weirdness if the user did not restart after installing deps.
+        //
+        // so yeah. i don't expect hot loading to make a return any time soon.
+        // - Snip
+
         private void downloadAllDependencies() {
             // 1. Compute the list of dependencies we must download.
             LogLine(Dialog.Clean("DEPENDENCYDOWNLOADER_DOWNLOADING_DATABASE"));
@@ -191,13 +205,16 @@ namespace Celeste.Mod.UI {
 
                 // unblacklist mods if this is needed
                 if (modFilenamesToUnblacklist.Count > 0) {
+                    shouldRestart = true;
                     // remove the mods from blacklist.txt
                     if (!unblacklistMods(modFilenamesToUnblacklist)) {
                         // something bad happened
                         shouldAutoExit = false;
-                        shouldRestart = true;
                     }
 
+                    // rip hot loading - see explanation comment near the top.
+                    // TODO: potentially improve hot loading implementation?
+                    /*
                     foreach (string modFilename in modFilenamesToUnblacklist) {
                         try {
                             LogLine(string.Format(Dialog.Get("DEPENDENCYDOWNLOADER_MOD_UNBLACKLIST"), modFilename));
@@ -221,6 +238,7 @@ namespace Celeste.Mod.UI {
                             break;
                         }
                     }
+                    */
                 }
 
                 // display all mods that couldn't be accounted for
@@ -351,6 +369,7 @@ namespace Celeste.Mod.UI {
                 using (StreamWriter blacklistTxt = File.CreateText(Everest.Loader.PathBlacklist)) {
                     foreach (string line in currentBlacklist) {
                         if (modFilenamesToUnblacklist.Contains(line)) {
+                            LogLine(string.Format(Dialog.Get("DEPENDENCYDOWNLOADER_MOD_UNBLACKLIST"), line));
                             // comment this line to unblacklist this mod.
                             blacklistTxt.WriteLine("# " + line);
                             modsLeftToUnblacklist.Remove(line);
@@ -470,8 +489,8 @@ namespace Celeste.Mod.UI {
                 }
 
                 // 3. Install mod
+                shouldRestart = true;
                 if (installedVersion != null) {
-                    shouldRestart = true;
                     LogLine(string.Format(Dialog.Get("DEPENDENCYDOWNLOADER_UPDATING"), mod.Name, installedVersion.Version, mod.Version, installedVersion.PathArchive));
                     ModUpdaterHelper.InstallModUpdate(mod, installedVersion, downloadDestination);
                 } else {
@@ -482,6 +501,9 @@ namespace Celeste.Mod.UI {
                     }
                     File.Move(downloadDestination, installDestination);
 
+                    // rip hot loading - see explanation comment near the top.
+                    // TODO: potentially improve hot loading implementation?
+                    /*
                     try {
                         if (!shouldRestart) { // don't waste time hot loading since we're restarting anyway
                             Everest.Loader.LoadZip(installDestination);
@@ -492,6 +514,7 @@ namespace Celeste.Mod.UI {
                         Logger.LogDetailed(e);
                         shouldRestart = true;
                     }
+                    */
                 }
 
             } catch (Exception e) {
