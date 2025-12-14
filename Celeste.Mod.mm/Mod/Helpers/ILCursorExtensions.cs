@@ -169,7 +169,7 @@ namespace Celeste.Mod.Helpers {
                     int instructionSpread = cursor.Index - beforeMoveIndex;
                     if (instructionSpread > maxInstructionSpread)
                     {
-                        Logger.Debug(NextBestFitLogID,
+                        Logger.Verbose(NextBestFitLogID,
                             $"Matched predicate #0 at index 0x{savedCursorPosition:X4}, but the instruction spread between predicates #{i-1} and #{i} has been exceeded " +
                             $"({instructionSpread} > {maxInstructionSpread}). Continuing search.");
 
@@ -420,7 +420,7 @@ namespace Celeste.Mod.Helpers {
                     int instructionSpread = cursor.Index - beforeMoveIndex;
                     if (instructionSpread > maxInstructionSpread)
                     {
-                        Logger.Debug(PrevBestFitLogID,
+                        Logger.Verbose(PrevBestFitLogID,
                             $"Matched predicate #0 at index 0x{savedCursorPosition:X4}, but the instruction spread between predicates #{i-1} and #{i} has been exceeded " +
                             $"({instructionSpread} > {maxInstructionSpread}). Continuing search.");
 
