@@ -277,6 +277,7 @@ public static class LibAndDepHandling {
                 File.Delete(Path.Combine(Globals.PathOSXExecDir, Path.GetFileNameWithoutExtension(appExe)));
                 File.CreateSymbolicLink(Path.Combine(Globals.PathOSXExecDir, Path.GetFileNameWithoutExtension(appExe)),
                                         Path.GetRelativePath(Globals.PathOSXExecDir, Path.ChangeExtension(appExe, null)));
+                File.Delete(Globals.PathCelesteExe);
             } break;
         }
     }
