@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Celeste.Mod.Entities {
@@ -67,7 +67,8 @@ namespace Celeste.Mod.Entities {
             Scene.Add(new DialogCutscene(dialogEntry, player, endLevel));
 
             if (noRespawnAfterUse) {
-                // can't remove the flag, some maps might depend on it
+                // this flag is unused in vanilla and Everest, but mods may still make use of it,
+                // so it remains here for backwards compatibility
                 level.Session.SetFlag("DoNotLoad" + id, true);
                 level.Session.DoNotLoad.Add(id);
             }
