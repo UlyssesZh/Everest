@@ -54,6 +54,7 @@ namespace Celeste.Mod.Meta {
         public string CassetteSong { get; set; }
 
         public string PostcardSoundID { get; set; }
+        public string PostcardTexture { get; set; }
 
         public string ForegroundTiles { get; set; }
         public string BackgroundTiles { get; set; }
@@ -244,6 +245,9 @@ namespace Celeste.Mod.Meta {
 
                 if (CassetteModifier != null)
                     meta.CassetteModifier = CassetteModifier;
+
+                if (PostcardTexture != null)
+                    meta.PostcardTexture = PostcardTexture;
             }
         }
 
