@@ -595,6 +595,11 @@ namespace Celeste {
 
             Scene nextScene = patch_Engine.NextScene;
 
+            bool shouldReloadPortraits = nextScene is not (LevelLoader or Pico8.Emulator or OverworldReflectionsFall);
+            bool shouldDissociateEntities = nextScene is not (Pico8.Emulator or OverworldReflectionsFall);
+
+            Everest.Events.Level.End(this, nextScene, ref shouldReloadPortraits, ref shouldDissociateEntities);
+
             // reload the vanilla Portraits.xml when exiting; if a map overrides the Portraits.xml
             // and doesn't have portrait_madeline defined, the game would crash when trying to load a save file
             // (since it shows madeline's portrait)
@@ -602,16 +607,15 @@ namespace Celeste {
             // however we need to pay attention to the new scene, else we'll reload vanilla portraits too soon
             // and make custom portraits stop working. therefore, we ignore these scenes as they don't actually
             // exit the map
-            if (nextScene is not (LevelLoader or Pico8.Emulator or OverworldReflectionsFall)) {
+            if (shouldReloadPortraits)
                 GFX.PortraitsSpriteBank = new SpriteBank(GFX.Portraits, Path.Combine("Graphics", "Portraits.xml"));
-            }
 
-            // if we are not entering PICO-8 or the Reflection Fall cutscene...
-            if (nextScene is not (Pico8.Emulator or OverworldReflectionsFall)) {
+            // if we are not entering PICO-8, the Reflection Fall cutscene, or some similar modded scene...
+            if (shouldDissociateEntities) {
                 // break all links between this level and its entities.
-                foreach (Entity entity in Entities) {
+                foreach (Entity entity in Entities)
                     ((patch_Entity) entity).DissociateFromScene();
-                }
+
                 ((patch_EntityList) (object) Entities).ClearEntities();
             }
         }
@@ -773,6 +777,11 @@ namespace Celeste.Mod {
                 public static event CompleteHandler OnComplete;
                 internal static void Complete(_Level level)
                     => OnComplete?.Invoke(level);
+
+                public delegate void EndHandler(_Level level, Scene nextScene, ref bool shouldReloadPortraits, ref bool shouldDissociateEntities);
+                public static event EndHandler OnEnd;
+                internal static void End(_Level level, Scene nextScene, ref bool shouldReloadPortraits, ref bool shouldDissociateEntities)
+                    => OnEnd?.Invoke(level, nextScene, ref shouldReloadPortraits, ref shouldDissociateEntities);
 
                 /// <summary>
                 /// Called at the very beginning of <see cref="global::Celeste.Level.Update"/>.
