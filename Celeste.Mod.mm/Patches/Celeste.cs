@@ -466,3 +466,25 @@ namespace MonoMod {
 
     }
 }
+
+namespace Celeste.Mod {
+    public static partial class Everest {
+        public static partial class Events {
+            public static class Celeste {
+                /// <summary>
+                /// Called after the main gameloop has finished running.
+                /// </summary>
+                public static event Action OnExiting;
+                internal static void Exiting()
+                    => OnExiting?.Invoke();
+
+                /// <summary>
+                /// Called just before the Main method exits.
+                /// </summary>
+                public static event Action OnShutdown;
+                internal static void Shutdown()
+                    => OnShutdown?.Invoke();
+            }
+        }
+    }
+}

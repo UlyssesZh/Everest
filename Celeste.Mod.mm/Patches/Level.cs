@@ -24,6 +24,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
+using _Level = Celeste.Level;
+using _Player = Celeste.Player;
+
 namespace Celeste {
     class patch_Level : Level {
 
@@ -695,6 +698,97 @@ namespace Celeste {
         public static void SetSubHudRenderer(this Level self, SubHudRenderer value)
             => ((patch_Level) self).SubHudRenderer = value;
 
+    }
+}
+
+namespace Celeste.Mod {
+    public static partial class Everest {
+        public static partial class Events {
+            public static partial class Level {
+                public delegate void PauseHandler(_Level level, int startIndex, bool minimal, bool quickReset);
+                /// <summary>
+                /// Called after <see cref="_Level.Pause(int, bool, bool)"/>.
+                /// </summary>
+                public static event PauseHandler OnPause;
+                internal static void Pause(_Level level, int startIndex, bool minimal, bool quickReset)
+                    => OnPause?.Invoke(level, startIndex, minimal, quickReset);
+
+                public delegate void UnpauseHandler(_Level level);
+                /// <summary>
+                /// Called after unpausing the Level.
+                /// </summary>
+                public static event UnpauseHandler OnUnpause;
+                internal static void Unpause(_Level level) => OnUnpause?.Invoke(level);
+
+                public delegate void CreatePauseMenuButtonsHandler(_Level level, patch_TextMenu menu, bool minimal);
+                /// <summary>
+                /// Called when the Level's pause menu is created.
+                /// </summary>
+                public static event CreatePauseMenuButtonsHandler OnCreatePauseMenuButtons;
+                internal static void CreatePauseMenuButtons(_Level level, patch_TextMenu menu, bool minimal)
+                    => OnCreatePauseMenuButtons?.Invoke(level, menu, minimal);
+
+                public delegate void TransitionToHandler(_Level level, LevelData next, Vector2 direction);
+                /// <summary>
+                /// Called after <see cref="_Level.TransitionTo(LevelData, Vector2)"/>
+                /// </summary>
+                public static event TransitionToHandler OnTransitionTo;
+                internal static void TransitionTo(_Level level, LevelData next, Vector2 direction)
+                    => OnTransitionTo?.Invoke(level, next, direction);
+
+                public delegate bool LoadEntityHandler(_Level level, LevelData levelData, Vector2 offset, EntityData entityData);
+                /// <summary>
+                /// Called during <see cref="patch_Level.LoadCustomEntity(EntityData, _Level)"/>.
+                /// </summary>
+                public static event LoadEntityHandler OnLoadEntity;
+                internal static bool LoadEntity(_Level level, LevelData levelData, Vector2 offset, EntityData entityData) {
+                    LoadEntityHandler onLoadEntity = OnLoadEntity;
+
+                    if (onLoadEntity == null)
+                        return false;
+
+                    // replicates the InvokeWhileFalse extension method, but hardcoding the type to avoid dynamic dispatch
+                    foreach (LoadEntityHandler handler in onLoadEntity.GetInvocationList()) {
+                        if (handler(level, levelData, offset, entityData))
+                            return true;
+                    }
+
+                    return false;
+                }
+
+                public delegate void LoadLevelHandler(_Level level, _Player.IntroTypes playerIntro, bool isFromLoader);
+                /// <summary>
+                /// Called after <see cref="_Level.LoadLevel"/>.<br/>
+                /// This event is invoked <b>every time</b> a room is entered - transition, respawn, teleport, etc.
+                /// </summary>
+                /// <seealso cref="LevelLoader.OnLoadingThread"/>
+                public static event LoadLevelHandler OnLoadLevel;
+                internal static void LoadLevel(_Level level, _Player.IntroTypes playerIntro, bool isFromLoader)
+                    => OnLoadLevel?.Invoke(level, playerIntro, isFromLoader);
+
+                public delegate void CompleteHandler(_Level level);
+                /// <summary>
+                /// Called at the end of <see cref="_Level.RegisterAreaComplete"/>.
+                /// </summary>
+                public static event CompleteHandler OnComplete;
+                internal static void Complete(_Level level)
+                    => OnComplete?.Invoke(level);
+
+                /// <summary>
+                /// Called at the very beginning of <see cref="global::Celeste.Level.Update"/>.
+                /// </summary>
+                public static event Action<_Level> OnBeforeUpdate;
+                internal static void BeforeUpdate(_Level level)
+                    => OnBeforeUpdate?.Invoke(level);
+
+                /// <summary>
+                /// Called at the very end of <see cref="global::Celeste.Level.Update"/>.
+                /// </summary>
+                public static event Action<_Level> OnAfterUpdate;
+                internal static void AfterUpdate(_Level level)
+                    => OnAfterUpdate?.Invoke(level);
+            }
+        }
     }
 }
 
