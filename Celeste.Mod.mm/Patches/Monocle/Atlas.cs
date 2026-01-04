@@ -12,6 +12,9 @@ using System.IO;
 using System.Xml;
 using Logger = Celeste.Mod.Logger;
 
+using _MTexture = Monocle.MTexture;
+using _Atlas = Monocle.Atlas;
+
 namespace Monocle {
     class patch_Atlas : Atlas {
 
@@ -466,6 +469,10 @@ namespace Monocle {
             [MonoModReplace]
             get {
                 if (!textures.TryGetValue(id, out MTexture result)) {
+                    MTexture customFallback = Everest.Events.Atlas.GetCustomFallback(this, id);
+                    if (customFallback != null)
+                        return customFallback;
+
                     Logger.Warn("Atlas", $"Requested texture that does not exist: {RelativeDataPath}{id}");
                     return GetFallback();
                 }
@@ -525,5 +532,23 @@ namespace Monocle {
         public static void Ingest(this Atlas self, ModAsset asset)
             => ((patch_Atlas) self).Ingest(asset);
 
+    }
+}
+
+namespace Celeste.Mod {
+    public static partial class Everest {
+        public static partial class Events {
+            public static class Atlas {
+                public delegate _MTexture CustomFallbackHandler(_Atlas atlas, string id);
+                /// <summary>
+                /// Called when getting a single texture by ID, when that texture isn't found.
+                /// If you return an MTexture, it will be used as if it was found in the atlas.<br/>
+                /// Note that returning an MTexture here suppresses the missing texture warning; if you want both, you must log the warning yourself.
+                /// </summary>
+                public static event CustomFallbackHandler OnGetCustomFallback;
+                internal static _MTexture GetCustomFallback(_Atlas atlas, string id)
+                    => OnGetCustomFallback?.InvokeWhileNull<_MTexture>(atlas, id);
+            }
+        }
     }
 }
