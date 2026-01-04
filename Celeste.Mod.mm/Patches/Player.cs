@@ -16,6 +16,7 @@ using MonoMod.Cil;
 using MonoMod.InlineRT;
 using MonoMod.Utils;
 
+using _Level = Celeste.Level;
 using _Player = Celeste.Player;
 
 namespace Celeste {
@@ -183,7 +184,8 @@ namespace Celeste {
                 if (framesAlive < 6 && level != null) {
                     diedInGBJ++;
                     if (diedInGBJ != 0 && (diedInGBJ % 2) == 0 && level.Session.Area.GetLevelSet() != "Celeste" && !CoreModule.Settings.DisableAntiSoftlock) {
-                        level.Pause();
+                        if (!Everest.Events.Player.PauseInGBJ(this))
+                            level.Pause();
                         return null;
                     }
                 }
@@ -374,6 +376,16 @@ namespace Celeste.Mod {
                 public static event Action<_Player> OnDie;
                 internal static void Die(_Player player)
                     => OnDie?.Invoke(player);
+
+                /// <summary>
+                /// Called in <see cref="_Player.Die"/>, just before pausing the game as a softlock prevention measure.
+                /// By returning <c>true</c> you can prevent the pause (and cancel invocation of this event).
+                ///
+                /// Intended to be used when <see cref="_Level.PauseLock"/> is enabled during normal gameplay where the player might die.
+                /// </summary>
+                public static event Func<_Player, bool> OnPauseInGBJ;
+                internal static bool PauseInGBJ(_Player player)
+                    => OnPauseInGBJ.InvokeWhileFalse(player);
 
                 /// <summary>
                 /// Called in the Player constructor during <see cref="StateMachine"/> initialisation, to be used to register custom Player states.
