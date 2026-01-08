@@ -82,7 +82,7 @@ namespace MiniInstaller {
 
                 if (Directory.Exists(Globals.PathMiniInstallerWorkspace)) {
                     Logger.LogLine("MiniInstaller workspace already exists, cleaning before continuing.");
-                    Directory.Delete(Globals.PathMiniInstallerWorkspace, true);
+                    Directory.Delete(Globals.PathMiniInstallerWorkspace, recursive: true);
                 }
 
                 Directory.CreateDirectory(Globals.PathMiniInstallerWorkspace);
@@ -115,7 +115,7 @@ namespace MiniInstaller {
                 XmlDoc.CombineXMLDoc(Path.ChangeExtension(Globals.PathCelesteExe, ".Mod.mm.xml"), Path.ChangeExtension(Globals.PathCelesteExe, ".xml"));
 
                 // Everything went well, cleaning MiniInstaller workspace
-                Directory.Delete(Globals.PathMiniInstallerWorkspace, true);
+                Directory.Delete(Globals.PathMiniInstallerWorkspace, recursive: true);
 
                 // If we're updating, start the game. Otherwise, close the window.
                 if (Globals.PathUpdate != null) {
