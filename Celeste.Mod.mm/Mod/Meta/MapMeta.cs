@@ -54,7 +54,6 @@ namespace Celeste.Mod.Meta {
         public string CassetteSong { get; set; }
 
         public string PostcardSoundID { get; set; }
-        public string PostcardTexture { get; set; }
 
         public string ForegroundTiles { get; set; }
         public string BackgroundTiles { get; set; }
@@ -75,6 +74,8 @@ namespace Celeste.Mod.Meta {
         public MapMetaTextVignette LoadingVignetteText { get; set; }
 
         public MapMetaCassetteModifier CassetteModifier { get; set; }
+
+        public MapMetaPostcard Postcard { get; set; }
 
         public void Parse(BinaryPacker.Element meta) {
             meta.AttrIf("Parent", v => Parent = v);
@@ -246,8 +247,8 @@ namespace Celeste.Mod.Meta {
                 if (CassetteModifier != null)
                     meta.CassetteModifier = CassetteModifier;
 
-                if (PostcardTexture != null)
-                    meta.PostcardTexture = PostcardTexture;
+                if (Postcard != null)
+                    meta.Postcard = Postcard;
             }
         }
 
@@ -551,5 +552,9 @@ namespace Celeste.Mod.Meta {
             meta.AttrIfBool("ActiveDuringTransitions", v => ActiveDuringTransitions = v);
             meta.AttrIfBool("OldBehavior", v => OldBehavior = v);
         }
+    }
+
+    public class MapMetaPostcard {
+        public string Texture { get; set; }
     }
 }

@@ -141,7 +141,7 @@ namespace Celeste {
         }
 
         private IEnumerator EnterWithPostcardRoutine(string message, string soundId)
-            => EnterWithPostcardRoutine(message, soundId, patch_AreaData.Get(session)?.Meta?.PostcardTexture);
+            => EnterWithPostcardRoutine(message, soundId, patch_AreaData.Get(session)?.Meta?.Postcard?.Texture);
 
         private IEnumerator EnterWithPostcardRoutine(string message, string soundId, string postcardTexture) {
             yield return 1f;
