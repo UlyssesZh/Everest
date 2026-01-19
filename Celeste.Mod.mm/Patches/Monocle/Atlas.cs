@@ -330,7 +330,7 @@ namespace Monocle {
         }
 
         public MTexture GetFallback() {
-            if (FallbackStack != null && FallbackStack.TryPeek(out MTexture texture))
+            if (FallbackStack?.TryPeek(out MTexture texture) ?? false)
                 return texture;
 
             if (DefaultFallback != null || textures.TryGetValue("__fallback", out DefaultFallback))
@@ -340,15 +340,14 @@ namespace Monocle {
         }
 
         public void PushFallback(MTexture fallback) {
-            if (FallbackStack == null)
-                FallbackStack = new ConcurrentStack<MTexture>();
+            FallbackStack ??= new ConcurrentStack<MTexture>();
             FallbackStack.Push(fallback);
         }
 
         public MTexture PopFallback() {
-            if (FallbackStack.TryPop(out MTexture texture))
+            if (FallbackStack?.TryPop(out MTexture texture) ?? false)
                 return texture;
-            throw new InvalidOperationException("Fallback stack is empty.");
+            throw new InvalidOperationException("Fallback stack is empty or has not been created.");
         }
 
         /// <summary>
