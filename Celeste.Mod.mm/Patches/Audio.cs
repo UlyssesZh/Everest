@@ -106,28 +106,7 @@ namespace Celeste {
                 }
             }
 
-            // Load any additional banks.
-            lock (Everest.Content.Map) {
-                bool nonBlockingLoad = CoreModule.Settings.FastFMODBankLoading ?? true;
-
-                if (nonBlockingLoad) {
-                    Logger.Info("Audio", "Loading FMOD banks in parallel");
-                }
-
-                List<KeyValuePair<ModAsset, Bank>> additionalBanksMapping = new List<KeyValuePair<ModAsset, Bank>>();
-                foreach (ModAsset asset in Everest.Content.Map.Values.Where(asset => asset.Type == typeof(AssetTypeBank))) {
-                    if (!ingestedModBankPaths.Contains(asset.PathVirtual)) {
-                        additionalBanksMapping.Add(new KeyValuePair<ModAsset, Bank>(asset, IngestBank(asset, nonBlockingLoad)));
-                    }
-                }
-
-                if (nonBlockingLoad) {
-                    PoolAndLoadBanksAndEvents(additionalBanksMapping);
-                }
-
-                additionalBanksMapping.Clear();
-                Logger.Info("Audio", $"Loaded {cachedBankPaths.Count} banks and {cachedModEvents.Count} events");
-            }
+            IngestNewBanks();
 
             AudioInitialized = true;
         }
@@ -138,11 +117,24 @@ namespace Celeste {
             }
 
             lock (Everest.Content.Map) {
+                bool nonBlockingLoad = CoreModule.Settings.FastFMODBankLoading ?? true;
+
+                if (nonBlockingLoad) {
+                    Logger.Info("Audio", "Loading FMOD banks in parallel");
+                }
+
+                List<(ModAsset, Bank)> additionalBanksMapping = new List<(ModAsset, Bank)>();
                 foreach (ModAsset asset in Everest.Content.Map.Values.Where(asset => asset.Type == typeof(AssetTypeBank))) {
                     if (!ingestedModBankPaths.Contains(asset.PathVirtual)) {
-                        IngestBank(asset);
+                        additionalBanksMapping.Add((asset, IngestBank(asset, nonBlockingLoad)));
                     }
                 }
+
+                if (nonBlockingLoad) {
+                    PoolAndLoadBanksAndEvents(additionalBanksMapping);
+                }
+
+                Logger.Info("Audio", $"Loaded {cachedBankPaths.Count} banks and {cachedModEvents.Count} events");
             }
         }
 
@@ -163,7 +155,7 @@ namespace Celeste {
             ready = false;
         }
 
-        private static void PoolAndLoadBanksAndEvents(List<KeyValuePair<ModAsset, Bank>> additionalBanksMapping) {
+        private static void PoolAndLoadBanksAndEvents(List<(ModAsset, Bank)> additionalBanksMapping) {
             while (additionalBanksMapping.Count > 0) {
                 // we can't use foreach as we remove elements while iterating
                 for (int i = additionalBanksMapping.Count - 1; i >= 0; i--) {
@@ -172,7 +164,9 @@ namespace Celeste {
                     RESULT result = bank.getLoadingState(out LOADING_STATE loadingState);
 
                     if (CheckForBankLoadingErrors(result, asset)) {
-                        bank.unload(); // failed asynchronous banks should be released according to FMOD documentation
+                        if (result == RESULT.ERR_EVENT_ALREADY_LOADED) {
+                            bank.unload(); // failed asynchronous banks should be released according to FMOD documentation
+                        }
                         additionalBanksMapping.RemoveAt(i);
                     } else if (loadingState != LOADING_STATE.LOADING) {
                         // assume loading was done correctly
@@ -182,7 +176,6 @@ namespace Celeste {
                 }
 
                 // wait before pooling loading state again
-                Logger.Info("Audio", "Sleeping waiting for bank/sample data to be loaded");
                 Thread.Sleep(100);
             }
         }
@@ -229,8 +222,9 @@ namespace Celeste {
                 loadResult = system.loadBankCustom(info, flags, out bank);
             }
 
-            if (nonBlockingLoad)
+            if (nonBlockingLoad) {
                 return bank; // error handling and post-processing will be done in init later
+            }
 
             if (CheckForBankLoadingErrors(loadResult, asset)) {
                 return null;
@@ -242,21 +236,20 @@ namespace Celeste {
         }
 
         /// <summary>
-        /// Check for loading errors.
+        /// Check for loading errors and log them.
         /// <br/>
-        /// Throws if there was an unrecoverable error
-        /// <br/>
-        /// Returns <c>true</c> if events were already loaded
-        /// <br/>
-        /// Returns <c>false</c> if no error was detected
+        /// Returns <c>true</c> if an error was detected, <c>false</c> otherwise.
         /// </summary>
         private static bool CheckForBankLoadingErrors(RESULT result, ModAsset asset) {
-            if (result == RESULT.ERR_EVENT_ALREADY_LOADED) {
-                Logger.Warn("Audio.IngestBank", $"Cannot load {asset.PathVirtual} due to conflicting events!");
-                return true;
-            } else {
-                result.CheckFMOD();
-                return false;
+            switch (result) {
+                case RESULT.OK:
+                    return false;
+                case RESULT.ERR_EVENT_ALREADY_LOADED:
+                    Logger.Warn("Audio.IngestBank", $"Cannot load {asset.PathVirtual} due to conflicting events!");
+                    return true;
+                default:
+                    Logger.Error("Audio.IngestBank", $"FMOD bank load failed on {asset.PathVirtual}: {result} ({Error.String(result)})");
+                    return true;
             }
         }
 
