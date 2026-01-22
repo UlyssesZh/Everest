@@ -114,27 +114,18 @@ namespace Celeste {
                     Logger.Info("Audio", "Loading FMOD banks in parallel");
                 }
 
+                List<KeyValuePair<ModAsset, Bank>> additionalBanksMapping = new List<KeyValuePair<ModAsset, Bank>>();
                 foreach (ModAsset asset in Everest.Content.Map.Values.Where(asset => asset.Type == typeof(AssetTypeBank))) {
                     if (!ingestedModBankPaths.Contains(asset.PathVirtual)) {
-                        additionalBanksMapping.Add(asset, IngestBank(asset, nonBlockingLoad));
+                        additionalBanksMapping.Add(new KeyValuePair<ModAsset, Bank>(asset, IngestBank(asset, nonBlockingLoad)));
                     }
                 }
 
                 if (nonBlockingLoad) {
-                    // pool loading state, and do post processing (GUID ingestion)
-                    while (IsAnyBankLoading()) {
-                        Logger.Info("Audio", "Sleeping waiting for bank/sample data to be loaded");
-                        Thread.Sleep(500);
-                    }
-
-                    foreach (ModAsset asset in Everest.Content.Map.Values.Where(asset => asset.Type == typeof(AssetTypeBank))) {
-                        IngestAllGUIDs(asset.PathVirtual);
-                    }
-
-                    CacheAllBanks();
+                    PoolAndLoadBanksAndEvents(additionalBanksMapping);
                 }
 
-                ResetBankLoadingState();
+                additionalBanksMapping.Clear();
                 Logger.Info("Audio", $"Loaded {cachedBankPaths.Count} banks and {cachedModEvents.Count} events");
             }
 
@@ -172,58 +163,38 @@ namespace Celeste {
             ready = false;
         }
 
-        // internal fields relecting bank loading state
-        internal readonly static Dictionary<ModAsset, Bank> additionalBanksMapping = new Dictionary<ModAsset, Bank>();
-        internal readonly static List<ModAsset> conflicts = new List<ModAsset>();
+        private static void PoolAndLoadBanksAndEvents(List<KeyValuePair<ModAsset, Bank>> additionalBanksMapping) {
+            while (additionalBanksMapping.Count > 0) {
+                // we can't use foreach as we remove elements while iterating
+                for (int i = additionalBanksMapping.Count - 1; i >= 0; i--) {
+                    (ModAsset asset, Bank bank) = additionalBanksMapping[i];
 
-        private static bool IsAnyBankLoading() {
-            foreach ((ModAsset asset, Bank bank) in additionalBanksMapping) {
-                if (conflicts.Contains(asset)) {
-                     // these assets are ignored, they will never be loaded and CheckFMOD will throw
-                    continue;
+                    RESULT result = bank.getLoadingState(out LOADING_STATE loadingState);
+
+                    if (CheckForBankLoadingErrors(result, asset)) {
+                        bank.unload(); // failed asynchronous banks should be released according to FMOD documentation
+                        additionalBanksMapping.RemoveAt(i);
+                    } else if (loadingState != LOADING_STATE.LOADING) {
+                        // assume loading was done correctly
+                        PostProcessBank(bank, asset);
+                        additionalBanksMapping.RemoveAt(i);
+                    }
                 }
 
-                RESULT result = bank.getLoadingState(out LOADING_STATE loadingState);
-                if (result == RESULT.ERR_EVENT_ALREADY_LOADED) {
-                    Logger.Warn("Audio.IngestBank", $"Cannot load {asset.PathVirtual} due to conflicting events!");
-                    conflicts.Add(asset);
-                } else {
-                    result.CheckFMOD();
-                }
-
-                if (loadingState == LOADING_STATE.LOADING) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static void IngestAllGUIDs(string virtualPath) {
-            if (Everest.Content.TryGet<AssetTypeGUIDs>(virtualPath + ".guids", out ModAsset assetGUIDs)) {
-                IngestGUIDs(assetGUIDs);
+                // wait before pooling loading state again
+                Logger.Info("Audio", "Sleeping waiting for bank/sample data to be loaded");
+                Thread.Sleep(100);
             }
         }
 
-        private static void CacheAllBanks() {
-            foreach ((ModAsset asset, Bank bank) in additionalBanksMapping) {
-                if (!conflicts.Contains(asset)) {
-                    patch_Banks.ModCache[asset] = bank;
-                    bank.getID(out Guid id);
-                    cachedBankPaths[id] = $"bank:/mods/{asset.PathVirtual["Audio/".Length..]}";
-                }
-            }
-        }
-
-        private static void ResetBankLoadingState() {
-            additionalBanksMapping.Clear();
-            conflicts.Clear();
-        }
+        // IngestBank(ModAsset) signature kept for ABI compatibility
+        public static Bank IngestBank(ModAsset asset)
+            => IngestBank(asset, false);
 
         /// <summary>
         /// Loads an FMOD Bank from the given asset.
         /// </summary>
-        public static Bank IngestBank(ModAsset asset, bool nonBlockingLoad = false) {
+        public static Bank IngestBank(ModAsset asset, bool nonBlockingLoad) {
             if (Everest.Flags.IsHeadless) {
                 return new Bank(IntPtr.Zero);
             }
@@ -261,22 +232,44 @@ namespace Celeste {
             if (nonBlockingLoad)
                 return bank; // error handling and post-processing will be done in init later
 
-            if (loadResult == RESULT.ERR_EVENT_ALREADY_LOADED) {
-                Logger.Warn("Audio.IngestBank", $"Cannot load {asset.PathVirtual} due to conflicting events!");
+            if (CheckForBankLoadingErrors(loadResult, asset)) {
                 return null;
             }
 
-            loadResult.CheckFMOD();
+            PostProcessBank(bank, asset);
 
+            return bank;
+        }
+
+        /// <summary>
+        /// Check for loading errors.
+        /// <br/>
+        /// Throws if there was an unrecoverable error
+        /// <br/>
+        /// Returns <c>true</c> if events were already loaded
+        /// <br/>
+        /// Returns <c>false</c> if no error was detected
+        /// </summary>
+        private static bool CheckForBankLoadingErrors(RESULT result, ModAsset asset) {
+            if (result == RESULT.ERR_EVENT_ALREADY_LOADED) {
+                Logger.Warn("Audio.IngestBank", $"Cannot load {asset.PathVirtual} due to conflicting events!");
+                return true;
+            } else {
+                result.CheckFMOD();
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Post process the bank (ingest GUIDs and cache it).
+        /// </summary>
+        private static void PostProcessBank(Bank bank, ModAsset asset) {
             if (Everest.Content.TryGet<AssetTypeGUIDs>(asset.PathVirtual + ".guids", out ModAsset assetGUIDs)) {
                 IngestGUIDs(assetGUIDs);
             }
-
             patch_Banks.ModCache[asset] = bank;
-
             bank.getID(out Guid id);
             cachedBankPaths[id] = $"bank:/mods/{asset.PathVirtual["Audio/".Length..]}";
-            return bank;
         }
 
         /// <summary>
@@ -498,7 +491,7 @@ namespace Celeste {
         public static void CheckFMOD(this RESULT result)
             => patch_Audio.CheckFmod(result);
 
-        /// <inheritdoc cref="patch_Audio.IngestBank(ModAsset, bool)"/>
+        /// <inheritdoc cref="patch_Audio.IngestBank(ModAsset)"/>
         public static Bank IngestBank(ModAsset asset)
             => patch_Audio.IngestBank(asset);
 
