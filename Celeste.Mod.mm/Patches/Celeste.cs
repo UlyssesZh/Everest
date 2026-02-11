@@ -383,6 +383,12 @@ https://discord.gg/6qjaePQ");
             Everest.Events.Celeste.Exiting();
         }
 
+        protected extern void orig_OnSceneTransition(Scene last, Scene next);
+        protected override void OnSceneTransition(Scene last, Scene next) {
+            orig_OnSceneTransition(last, next);
+            Everest.Events.Celeste.SceneTransition(last, next);
+        }
+
     }
 }
 
@@ -484,6 +490,14 @@ namespace Celeste.Mod {
                 public static event Action OnShutdown;
                 internal static void Shutdown()
                     => OnShutdown?.Invoke();
+
+                /// <summary>
+                /// Called when the current <see cref="Scene"/> (<c>Engine.Scene</c>) is changed.
+                /// </summary>
+                public static event SceneTransitionHandler OnSceneTransition;
+                public delegate void SceneTransitionHandler(Scene last, Scene next);
+                internal static void SceneTransition(Scene last, Scene next)
+                    => OnSceneTransition?.Invoke(last, next);
             }
         }
     }
