@@ -16,6 +16,9 @@ namespace Celeste {
         public extern void orig_Draw(Matrix matrix, Color color);
 
         public void Draw(Matrix matrix, Color color) {
+            // the orig method doesn't reset DepthStencilState to None.
+            // Some mods may begin a new SpriteBatch with DepthStencilState set to Default,
+            // which causes the Skybox to be rendered in front of the mountain.
             Engine.Graphics.GraphicsDevice.DepthStencilState = DepthStencilState.None;
             orig_Draw(matrix, color);
         }
