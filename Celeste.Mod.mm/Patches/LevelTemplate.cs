@@ -42,6 +42,7 @@ namespace Celeste.Editor {
             return CullHelper.IsRectangleVisible(X, Y, Width, Height, camera: camera);
         }
 
+        // gets the room's color from the editor color index (either directly from the list of colors or by unpacking it)
         private static Color GetEditorColor(int editorColorIndex) {
             // fallback for negative indices
             if (editorColorIndex < 0)
