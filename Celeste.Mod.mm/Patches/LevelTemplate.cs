@@ -16,8 +16,8 @@ namespace Celeste.Editor {
 
         // custom room color
         // if null, `EditorColorIndex` will be used to determine the room color
-        private Color? editorColor;
-        public Color EditorColor => editorColor ?? fgTilesColor[EditorColorIndex];
+        public Color? CustomEditorColor;
+        public Color EditorColor => CustomEditorColor ?? fgTilesColor[EditorColorIndex];
         
         public patch_LevelTemplate(LevelData data)
             : base(data) {
@@ -32,7 +32,7 @@ namespace Celeste.Editor {
         public void ctor(LevelData data) {
             orig_ctor(data);
 
-            editorColor = ((patch_LevelData) data).EditorColor;
+            CustomEditorColor = ((patch_LevelData) data).CustomEditorColor;
         }
         
         [MonoModIgnore]

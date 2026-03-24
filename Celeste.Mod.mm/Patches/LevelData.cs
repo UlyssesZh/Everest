@@ -19,7 +19,7 @@ namespace Celeste {
 
         // custom room color
         // if null, `EditorColorIndex` will be used to determine the room color
-        public Color? EditorColor;
+        public Color? CustomEditorColor;
 
         public patch_LevelData(BinaryPacker.Element data) : base(data) {
             // no-op. MonoMod ignores this - we only need this to make the compiler shut up.
@@ -36,7 +36,7 @@ namespace Celeste {
             orig_ctor(data);
 
             string color = data.Attr("color");
-            EditorColor = string.IsNullOrEmpty(color) ? null : Calc.HexToColor(color);
+            CustomEditorColor = string.IsNullOrEmpty(color) ? null : Calc.HexToColor(color);
         }
 
         private void CheckForDefaultSpawn(BinaryPacker.Element spawn, Vector2 coords) {
