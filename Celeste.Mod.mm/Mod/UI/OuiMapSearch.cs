@@ -175,7 +175,12 @@ namespace Celeste.Mod.UI {
             } else if (c == (char) 8) {
                 // Backspace - trim.
                 if (search.Length > 0) {
-                    search = search.Substring(0, search.Length - 1);
+                    if (MInput.Keyboard.CurrentState.IsKeyDown(Keys.LeftControl)
+                    || MInput.Keyboard.CurrentState.IsKeyDown(Keys.RightControl)) {
+                        search = "";
+                    } else {
+                        search = search.Substring(0, search.Length - 1);
+                    }
                     Audio.Play(SFX.ui_main_rename_entry_backspace);
                     goto ValidButton;
                 } else {
