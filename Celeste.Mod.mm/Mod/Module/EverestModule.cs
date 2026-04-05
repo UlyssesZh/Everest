@@ -753,6 +753,7 @@ namespace Celeste.Mod {
                     for (int i = 0; i < enumValues.Length; i++) {
                         if (enumValues.GetValue(i).Equals(value)) {
                             valueIndex = i;
+                            break;
                         }
                     }
                     string enumNamePrefix = $"{nameDefaultPrefix}{prop.Name.ToLowerInvariant()}_";
