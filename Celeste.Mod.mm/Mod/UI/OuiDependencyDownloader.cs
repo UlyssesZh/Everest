@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Authentication;
 
 namespace Celeste.Mod.UI {
     class OuiDependencyDownloader : OuiLoggedProgress {
@@ -474,7 +475,7 @@ namespace Celeste.Mod.UI {
                         LogLine(Dialog.Clean("DEPENDENCYDOWNLOADER_VERIFYING_CHECKSUM"));
                         ModUpdaterHelper.VerifyChecksum(mod, downloadDestination);
                         break; // out of the loop
-                    } catch (Exception e) when (e is WebException or TimeoutException or IOException) {
+                    } catch (Exception e) when (e is WebException or TimeoutException or IOException or AuthenticationException) {
                         downloadException = e;
                         Logger.Warn("OuiDependencyDownloader", $"Download failed, trying another mirror");
                         Logger.LogDetailed(e);

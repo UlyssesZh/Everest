@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using System.Security.Authentication;
 
 namespace Celeste.Mod.UI {
     class OuiModUpdateList : Oui, OuiModOptions.ISubmenu {
@@ -360,7 +361,7 @@ namespace Celeste.Mod.UI {
 
                     ModUpdaterHelper.VerifyChecksum(update, zipPath);
                     break; // out of the loop
-                } catch (Exception e) when (e is WebException or TimeoutException) {
+                } catch (Exception e) when (e is WebException or TimeoutException or IOException or AuthenticationException) {
                     downloadException = e;
                     Logger.Warn("OuiModUpdateList", $"Download from {url} failed, trying another mirror.");
                     Logger.LogDetailed(e);

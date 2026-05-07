@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Authentication;
 
 namespace Celeste.Mod.UI {
     public class AutoModUpdater : Scene {
@@ -142,7 +143,7 @@ namespace Celeste.Mod.UI {
                             ModUpdaterHelper.VerifyChecksum(update, zipPath);
 
                             break; // out of the loop
-                        } catch (Exception e) when (e is WebException or TimeoutException or IOException) {
+                        } catch (Exception e) when (e is WebException or TimeoutException or IOException or AuthenticationException) {
                             downloadException = e;
                             Logger.Warn("AutoModUpdater", $"Download from {url} failed, trying another mirror");
                             Logger.LogDetailed(e);
