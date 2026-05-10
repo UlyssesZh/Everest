@@ -146,18 +146,28 @@ namespace Celeste.Mod {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
 
             try {
-                using (FileStream stream = File.OpenWrite(path)) {
-                    if (_Settings is EverestModuleBinarySettings) {
-                        using (BinaryWriter writer = new BinaryWriter(stream)) {
-                            ((EverestModuleBinarySettings) _Settings).Write(writer);
-                            if (forceFlush || ((CoreModule.Settings.SaveDataFlush ?? true) && !MainThreadHelper.IsMainThread))
-                                stream.Flush(true);
+                using (FileStream fileStream = File.OpenWrite(path)) {
+                    if (_Settings is EverestModuleBinarySettings settings) {
+                        using (BinaryWriter binaryWriter = new BinaryWriter(fileStream)) {
+                            settings.Write(binaryWriter);
+                            if (forceFlush || ((CoreModule.Settings.SaveDataFlush ?? true) && !MainThreadHelper.IsMainThread)) {
+                                // first flush the binaryWriter to the fileStream then flush the fileStream
+                                // otherwise some data may remain buffered in the binaryWriter
+                                // and cause additional writes to the file
+                                binaryWriter.Flush();
+                                fileStream.Flush(true);
+                            }
                         }
                     } else {
-                        using (StreamWriter writer = new StreamWriter(stream)) {
-                            YamlHelper.Serializer.Serialize(writer, _Settings, SettingsType);
-                            if (forceFlush || ((CoreModule.Settings.SaveDataFlush ?? true) && !MainThreadHelper.IsMainThread))
-                                stream.Flush(true);
+                        using (StreamWriter streamWriter = new StreamWriter(fileStream)) {
+                            YamlHelper.Serializer.Serialize(streamWriter, _Settings, SettingsType);
+                            if (forceFlush || ((CoreModule.Settings.SaveDataFlush ?? true) && !MainThreadHelper.IsMainThread)) {
+                                // first flush the streamWriter to the fileStream then flush the fileStream
+                                // otherwise some data may remain buffered in the streamWriter
+                                // and cause additional writes to the file
+                                streamWriter.Flush();
+                                fileStream.Flush(true);
+                            }
                         }
                     }
                 }
