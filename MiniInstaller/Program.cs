@@ -87,25 +87,26 @@ namespace MiniInstaller {
 
                 Directory.CreateDirectory(Globals.PathMiniInstallerWorkspace);
 
-                string coreifiedCeleste = Path.Combine(Globals.PathMiniInstallerWorkspace, "Celeste.Core.dll");
-                string coreifiedModdedCeleste = Path.Combine(Globals.PathMiniInstallerWorkspace, "Celeste.dll");
+                string moddedCeleste = Path.Combine(Globals.PathMiniInstallerWorkspace, "Celeste.dll");
                 string moddedFNA = Path.Combine(Globals.PathMiniInstallerWorkspace, "FNA.dll");
                 string hookGenTempOutput = Path.Combine(Globals.PathMiniInstallerWorkspace, "MMHOOK_" + Path.ChangeExtension(Path.GetFileName(Globals.PathCelesteExe), ".dll"));
 
                 DepCalls.LoadModders();
 
-                DepCalls.ConvertToNETCore(Path.Combine(Globals.PathOrig, "Celeste.exe"), coreifiedCeleste);
+                // DepCalls.ConvertToNETCore also converts dependencies, so FNA will also be copied to the workspace
+                DepCalls.ConvertToNETCore(Path.Combine(Globals.PathOrig, "Celeste.exe"), moddedCeleste);
 
                 string everestModDLL = Path.ChangeExtension(Globals.PathCelesteExe, ".Mod.mm.dll");
                 string[] mods = new string[] { Globals.PathEverestLib, everestModDLL };
-                DepCalls.RunMonoMod(Path.Combine(Globals.PathEverestLib, "FNA.dll"), moddedFNA, dllPaths: mods); // We need to patch some methods in FNA as well
-                DepCalls.RunMonoMod(coreifiedCeleste, coreifiedModdedCeleste, dllPaths: mods);
+
+                DepCalls.RunMonoMod(moddedFNA, dllPaths: mods); // We need to patch some methods in FNA as well
+                DepCalls.RunMonoMod(moddedCeleste, dllPaths: mods);
 
                 string hookGenOutput = Path.Combine(Globals.PathGame, "MMHOOK_" + Path.ChangeExtension(Path.GetFileName(Globals.PathCelesteExe), ".dll"));
-                DepCalls.RunHookGen(coreifiedModdedCeleste, coreifiedModdedCeleste);
+                DepCalls.RunHookGen(moddedCeleste, moddedCeleste);
                 DepCalls.RunMonoMod(hookGenTempOutput, dllPaths: mods); // We need to fix some MonoMod crimes, so relink it against the legacy MonoMod layer
 
-                MiscUtil.MoveExecutable(coreifiedModdedCeleste, Globals.PathEverestDLL);
+                MiscUtil.MoveExecutable(moddedCeleste, Globals.PathEverestDLL);
                 MiscUtil.MoveExecutable(moddedFNA, Path.Combine(Globals.PathGame, "FNA.dll"));
                 MiscUtil.MoveExecutable(hookGenTempOutput, hookGenOutput);
 
