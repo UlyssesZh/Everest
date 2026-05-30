@@ -10,13 +10,13 @@ jobs:
       matrix:
         tas:
           - name: Celeste 100%
-            url: "https://github.com/VampireFlower/CelesteTAS/archive/97be00d13323487e595a537407dae0a3bfe281a8.zip"
-            path: "CelesteTAS-97be00d13323487e595a537407dae0a3bfe281a8/0 - 100%.tas"
+            url: "https://github.com/VampireFlower/CelesteTAS/archive/d34bd24434888ea15ef36d91522a803749cda96d.zip"
+            path: "CelesteTAS-d34bd24434888ea15ef36d91522a803749cda96d/0 - 100%.tas"
 
           - name: Strawberry Jam All Levels
-            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/5e015ce6882b00f96910613192700f71333073c5.zip"
-            path: "StrawberryJamTAS-5e015ce6882b00f96910613192700f71333073c5/0-SJ All Levels.tas"
-            bundle: "https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-78c358fa.zip"
+            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/9e019be8c48d2784089315eede0201ed058f82a4.zip"
+            path: "StrawberryJamTAS-9e019be8c48d2784089315eede0201ed058f82a4/0-SJ All Levels.tas"
+            bundle: "https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-8b6d87e2.zip"
 
     runs-on: ubuntu-latest
     timeout-minutes: 60
