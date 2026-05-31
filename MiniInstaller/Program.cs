@@ -68,9 +68,6 @@ namespace MiniInstaller {
 
                 InGameUpdaterHelper.MoveFilesFromUpdate();
 
-                if (File.Exists(Globals.PathEverestDLL))
-                    File.Delete(Globals.PathEverestDLL);
-
                 if (Globals.Platform == Globals.InstallPlatform.MacOS && !File.Exists(Path.Combine(Globals.PathGame, "Celeste.png")))
                     File.Move(Path.Combine(Globals.PathGame, "Celeste-icon.png"), Path.Combine(Globals.PathGame, "Celeste.png"));
                 else
