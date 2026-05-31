@@ -90,6 +90,7 @@ namespace MiniInstaller {
                 string moddedCeleste = Path.Combine(Globals.PathMiniInstallerWorkspace, "Celeste.dll");
                 string moddedFNA = Path.Combine(Globals.PathMiniInstallerWorkspace, "FNA.dll");
                 string hookGenTempOutput = Path.Combine(Globals.PathMiniInstallerWorkspace, "MMHOOK_" + Path.ChangeExtension(Path.GetFileName(Globals.PathCelesteExe), ".dll"));
+                string tempAppHost = Path.ChangeExtension(moddedCeleste, ".exe");
 
                 DepCalls.LoadModders();
 
@@ -102,20 +103,24 @@ namespace MiniInstaller {
                 DepCalls.RunMonoMod(moddedFNA, dllPaths: mods); // We need to patch some methods in FNA as well
                 DepCalls.RunMonoMod(moddedCeleste, dllPaths: mods);
 
-                string hookGenOutput = Path.Combine(Globals.PathGame, "MMHOOK_" + Path.ChangeExtension(Path.GetFileName(Globals.PathCelesteExe), ".dll"));
                 DepCalls.RunHookGen(moddedCeleste, moddedCeleste);
                 DepCalls.RunMonoMod(hookGenTempOutput, dllPaths: mods); // We need to fix some MonoMod crimes, so relink it against the legacy MonoMod layer
 
-                MiscUtil.MoveExecutable(moddedCeleste, Globals.PathEverestDLL);
+                string tempEverestXml = Path.Combine(Globals.PathMiniInstallerWorkspace, "Celeste.Mod.mm.xml");
+                string tempCelesteXml = Path.Combine(Globals.PathMiniInstallerWorkspace, "Celeste.xml");
+                File.Copy(Path.ChangeExtension(Globals.PathCelesteExe, ".Mod.mm.xml")!, tempEverestXml, overwrite: true);
+                File.Copy(Path.ChangeExtension(Globals.PathCelesteExe, ".xml")!, tempCelesteXml, overwrite: true);
+                XmlDoc.CombineXMLDoc(tempEverestXml, tempCelesteXml);
+
+                // Everything went well, copy files over, prepare the apphost and clean the workspace
+                string hookGenOutput = Path.Combine(Globals.PathGame, "MMHOOK_" + Path.ChangeExtension(Path.GetFileName(Globals.PathCelesteExe), ".dll"));
                 MiscUtil.MoveExecutable(moddedFNA, Path.Combine(Globals.PathGame, "FNA.dll"));
                 MiscUtil.MoveExecutable(hookGenTempOutput, hookGenOutput);
-
+                MiscUtil.MoveExecutable(moddedCeleste, Globals.PathEverestDLL);
+                File.Copy(tempCelesteXml, Path.ChangeExtension(Globals.PathCelesteExe, ".xml")!, overwrite: true);
                 LibAndDepHandling.CreateRuntimeConfigFiles(Globals.PathEverestDLL, new string[] { everestModDLL, hookGenOutput });
                 LibAndDepHandling.SetupAppHosts(Globals.PathCelesteExe, Globals.PathEverestDLL, Globals.PathEverestDLL);
 
-                XmlDoc.CombineXMLDoc(Path.ChangeExtension(Globals.PathCelesteExe, ".Mod.mm.xml"), Path.ChangeExtension(Globals.PathCelesteExe, ".xml"));
-
-                // Everything went well, cleaning MiniInstaller workspace
                 Directory.Delete(Globals.PathMiniInstallerWorkspace, recursive: true);
 
                 // If we're updating, start the game. Otherwise, close the window.
