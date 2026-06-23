@@ -617,6 +617,8 @@ namespace Celeste {
                         return this;
                     }
                     item.Container = null;
+                    if (item is SubMenu menu) 
+                        menu.Parent = null;
                     Container.Remove(item.ValueWiggler);
                     Container.Remove(item.SelectWiggler);
                     RecalculateSize();
@@ -722,6 +724,8 @@ namespace Celeste {
                 }
                 foreach (TextMenu.Item item in Items) {
                     if (item.Visible) {
+                        if (item is SubMenu menu)  // The heights of the submenus may change at any time due to the ease parameter, recalculation is needed
+                            menu.RecalculateSize();
                         MenuHeight += item.Height() + Container.ItemSpacing;
                     }
                 }
