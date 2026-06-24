@@ -756,10 +756,16 @@ namespace Celeste.Mod {
                             );
                         });
                 }
-                else if (propType.IsEnum)
-                {
+                else if (propType.IsEnum) {
                     Array enumValues = Enum.GetValues(propType);
-                    Array.Sort((int[]) enumValues);
+                    Array.Sort(enumValues);
+                    int valueIndex = 0; // Default to the first option if the value is not found
+                    for (int i = 0; i < enumValues.Length; i++) {
+                        if (enumValues.GetValue(i).Equals(value)) {
+                            valueIndex = i;
+                            break;
+                        }
+                    }
                     string enumNamePrefix = $"{nameDefaultPrefix}{prop.Name.ToLowerInvariant()}_";
                     item =
                         new TextMenu.Slider(name, (i) => {
@@ -768,8 +774,8 @@ namespace Celeste.Mod {
                                 $"{enumNamePrefix}{enumName.ToLowerInvariant()}".DialogCleanOrNull() ??
                                 $"modoptions_{propType.Name.ToLowerInvariant()}_{enumName.ToLowerInvariant()}".DialogCleanOrNull() ??
                                 enumName;
-                        }, 0, enumValues.Length - 1, (int) value)
-                        .Change(v => prop.SetValue(settingsObject, v));
+                        }, 0, enumValues.Length - 1, valueIndex)
+                        .Change(v => prop.SetValue(settingsObject, enumValues.GetValue(v)));
                 }
                 else if (propType == typeof(string))
                 {
