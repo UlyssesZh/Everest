@@ -177,7 +177,11 @@ namespace Celeste.Mod.UI {
                 if (search.Length > 0) {
                     if (MInput.Keyboard.CurrentState.IsKeyDown(Keys.LeftControl)
                     || MInput.Keyboard.CurrentState.IsKeyDown(Keys.RightControl)) {
-                        search = "";
+                        int idx = search.Length - 1;
+                        while (idx >= 0 && char.IsWhiteSpace(search[idx])) idx--;
+                        while (idx >= 0 && !char.IsWhiteSpace(search[idx])) idx--;
+                        search = search.Substring(0, idx+1);
+                        
                     } else {
                         search = search.Substring(0, search.Length - 1);
                     }
