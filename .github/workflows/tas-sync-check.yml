@@ -10,23 +10,23 @@ jobs:
       matrix:
         tas:
           - name: Celeste 100%
-            url: "https://github.com/VampireFlower/CelesteTAS/archive/d34bd24434888ea15ef36d91522a803749cda96d.zip"
-            path: "CelesteTAS-d34bd24434888ea15ef36d91522a803749cda96d/0 - 100%.tas"
+            url: "https://github.com/VampireFlower/CelesteTAS/archive/b1a9aa21c51835df9a1be44f18929d97ffac375e.zip"
+            path: "CelesteTAS-b1a9aa21c51835df9a1be44f18929d97ffac375e/0 - 100%.tas"
 
           - name: Strawberry Jam All Levels
-            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/9e019be8c48d2784089315eede0201ed058f82a4.zip"
-            path: "StrawberryJamTAS-9e019be8c48d2784089315eede0201ed058f82a4/0-SJ All Levels.tas"
-            bundle: "https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-8b6d87e2.zip"
+            url: "https://github.com/VampireFlower/StrawberryJamTAS/archive/99600b8ee3329c1062fc9537c057c706de048361.zip"
+            path: "StrawberryJamTAS-99600b8ee3329c1062fc9537c057c706de048361/0-SJ All Levels.tas"
+            bundle: "https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-86e25e7c.zip"
 
     runs-on: ubuntu-latest
     timeout-minutes: 60
     name: ${{ matrix.tas.name }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v4
 
     - name: Wait for Azure build on commit ${{ github.sha }}
       run: cd .github/tas-check && ./1-get-build-url.sh "${{ github.sha }}"
