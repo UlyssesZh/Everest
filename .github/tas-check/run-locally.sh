@@ -11,14 +11,14 @@ set -xeo pipefail
 
 case "$1" in
     "Celeste")
-        TAS_URL="https://github.com/VampireFlower/CelesteTAS/archive/d34bd24434888ea15ef36d91522a803749cda96d.zip"
-        TAS_PATH="CelesteTAS-d34bd24434888ea15ef36d91522a803749cda96d/0 - 100%.tas"
+        TAS_URL="https://github.com/VampireFlower/CelesteTAS/archive/b1a9aa21c51835df9a1be44f18929d97ffac375e.zip"
+        TAS_PATH="CelesteTAS-b1a9aa21c51835df9a1be44f18929d97ffac375e/0 - 100%.tas"
         ;;
 
     "StrawberryJam2021")
-        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/9e019be8c48d2784089315eede0201ed058f82a4.zip"
-        TAS_PATH="StrawberryJamTAS-9e019be8c48d2784089315eede0201ed058f82a4/0-SJ All Levels.tas"
-        BUNDLE_DOWNLOAD="https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-8b6d87e2.zip"
+        TAS_URL="https://github.com/VampireFlower/StrawberryJamTAS/archive/47591b2d1fa217f8d0eabe9172cd5b829ace0fb7.zip"
+        TAS_PATH="StrawberryJamTAS-47591b2d1fa217f8d0eabe9172cd5b829ace0fb7/0-SJ All Levels.tas"
+        BUNDLE_DOWNLOAD="https://celestemodupdater.0x0a.de/pinned-mods/StrawberryJam2021-Bundle-86e25e7c.zip"
         ;;
 
     *)
